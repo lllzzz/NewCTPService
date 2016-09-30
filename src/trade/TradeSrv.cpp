@@ -21,6 +21,11 @@ TradeSrv::TradeSrv()
 
     _reqID = 1;
 
+    _cancelTimesMax = Lib::stoi(C::get("cancel_times"));
+
+    // 初始化是否可以撤单
+    _rds->set("CAN_CANCEL", "1");
+
     // 初始化交易接口
     _tApi = CThostFtdcTraderApi::CreateFtdcTraderApi(Lib::stoc(_flowPath));
     _tApi->RegisterSpi(this);
@@ -83,6 +88,7 @@ void TradeSrv::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
     if (pRspInfo && pRspInfo->ErrorID != 0) {
         _logger->error("TradeSrv[OnRspSettlementInfoConfirm]", pRspInfo, nRequestID, bIsLast);
     }
+    _confirmDate = string(pSettlementInfoConfirm->ConfirmDate);
     _logger->push("ConfirmDate", string(pSettlementInfoConfirm->ConfirmDate));
     _logger->push("ConfirmTime", string(pSettlementInfoConfirm->ConfirmTime));
     _logger->info("TradeSpi[OnRspSettlementInfoConfirm]");
@@ -94,6 +100,14 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
     if (_isExistOrder(appKey, orderID)) {
         _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单", orderID);
         return;
+    }
+    if (type == ORDER_TYPE_NORMAL) { // 普通单有可能撤单，所以要判断撤单限制
+        int cancelTimes = _getCancelTimes();
+        if (cancelTimes >= _cancelTimesMax) {
+            _rds->set("CAN_CANCEL", "0");
+            _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "撤单已达上限，不能再下单", orderID);
+            return;
+        }
     }
     _initOrder(appKey, orderID, iid);
 
@@ -316,6 +330,7 @@ void TradeSrv::cancel(int appKey, int orderID)
             _rspMsg(appKey, res, "订单撤销失败", orderID);
         }
     }
+    _incrCancelTimes();
 }
 
 
@@ -722,4 +737,15 @@ void TradeSrv::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvest
     data["openAmnt"] = pInvestorPosition->OpenAmount;
     data["closeAmnt"] = pInvestorPosition->CloseAmount;
     _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
+}
+
+
+void TradeSrv::_incrCancelTimes()
+{
+    _rdsLocal->incr("CANCEL_TIMES_" + _confirmDate);
+}
+
+int TradeSrv::_getCancelTimes()
+{
+    return Lib::stoi(_rdsLocal->get("CANCEL_TIMES_" + _confirmDate));
 }

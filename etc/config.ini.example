@@ -25,6 +25,8 @@ mysql_name_trade_dev = ctp_trade_dev
 
 iids = sn1609/hc1610/rb1610/ni1609
 
+cancel_times = 500
+
 market_broker_id_online =
 market_user_id_online =
 market_password_online =

@@ -46,6 +46,8 @@ private:
     int _sessionID;
     int _maxOrderRef;
     int _reqID;
+    string _confirmDate;
+    int _cancelTimesMax;
 
     // 通知结果的频道
     string _channelRsp;
@@ -66,6 +68,9 @@ private:
     // 处理订单反馈
     void _onOrder(CThostFtdcOrderField *);
     void _onCancel(CThostFtdcOrderField *);
+
+    void _incrCancelTimes();
+    int _getCancelTimes();
 
     // 客户端订单
     std::map<int, std::map<int, OrderInfo> > _orderInfoViaAO; // appKey => orderID => orderRef
