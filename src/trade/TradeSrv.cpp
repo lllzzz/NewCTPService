@@ -92,7 +92,7 @@ void TradeSrv::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBuy, int total, double price, int type)
 {
     if (_isExistOrder(appKey, orderID)) {
-        _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单");
+        _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单", orderID);
         return;
     }
     _initOrder(appKey, orderID, iid);
@@ -143,7 +143,7 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
         _logger->request("TradeSrv[ReqOrderInsert]", _maxOrderRef, res);
         if (res == 0) break;
         if (tryTimes == 0 && res < 0) {
-            _rspMsg(appKey, res, "发送订单失败");
+            _rspMsg(appKey, res, "发送订单失败", orderID);
         }
     }
 
@@ -250,6 +250,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
     _logger->push("tradeTime", string(pTrade->TradeTime));
     _logger->push("ExchangeID", string(pTrade->ExchangeID));
     _logger->push("Volume", Lib::itos(pTrade->Volume));
+    _logger->push("TradeID", string(pTrade->TradeID));
     _logger->info("TradeSrv[OnRtnTrade]");
 
     Json::Value data;
@@ -259,7 +260,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
     data["orderID"] = info.orderID;
     data["realPrice"] = pTrade->Price;
     data["successVol"] = pTrade->Volume;
-    _rspMsg(info.appKey, CODE_SUCCESS, "成功", &data);
+    _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
 
     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
     data["appKey"] = info.appKey;
@@ -313,7 +314,7 @@ void TradeSrv::cancel(int appKey, int orderID)
         _logger->request("TradeSrv[cancel]", info.orderRef, res);
         if (res == 0) break;
         if (tryTimes == 0 && res < 0) {
-            _rspMsg(appKey, res, "订单撤销失败");
+            _rspMsg(appKey, res, "订单撤销失败", orderID);
         }
     }
 }
@@ -340,7 +341,7 @@ void TradeSrv::_onCancel(CThostFtdcOrderField *pOrder)
     data["price"] = pOrder->LimitPrice;
     data["cancelVol"] = pOrder->VolumeTotal;
 
-    _rspMsg(info.appKey, CODE_SUCCESS, "成功", &data);
+    _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
 
     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
     data["appKey"] = info.appKey;
@@ -395,7 +396,7 @@ void TradeSrv::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThos
     _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
     _logger->info("TradeSrv[OnErrRtnOrderInsert]");
 
-    _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)));
+    _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
 }
 
 void TradeSrv::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -416,7 +417,7 @@ void TradeSrv::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderActi
     _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
     _logger->info("TradeSrv[OnRspOrderAction]");
 
-    _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)));
+    _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
 
 }
 
@@ -481,11 +482,12 @@ void TradeSrv::_updateOrder(int orderRef, CThostFtdcOrderField *pOrder)
     _orderInfoViaAO[info.appKey][info.orderID] = info;
 }
 
-void TradeSrv::_rspMsg(int appKey, int err, string msg, Json::Value * data)
+void TradeSrv::_rspMsg(int appKey, int err, string msg, int orderID, Json::Value * data)
 {
     Json::Value rsp;
     rsp["err"] = err;
     rsp["msg"] = msg;
+    rsp["orderID"] = orderID;
     if (data) rsp["data"] = *data;
 
     Json::FastWriter writer;
@@ -663,7 +665,7 @@ void TradeSrv::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRa
     data["closeByVol"] = pInstrumentCommissionRate->CloseRatioByVolume;
     data["closeTodayByMoney"] = pInstrumentCommissionRate->CloseTodayRatioByMoney;
     data["closeTodayByVol"] = pInstrumentCommissionRate->CloseTodayRatioByVolume;
-    _rspMsg(appKey, CODE_SUCCESS, "成功", &data);
+    _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
 }
 
 
@@ -720,5 +722,5 @@ void TradeSrv::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvest
     data["closeVol"] = pInvestorPosition->CloseVolume;
     data["openAmnt"] = pInvestorPosition->OpenAmount;
     data["closeAmnt"] = pInvestorPosition->CloseAmount;
-    _rspMsg(appKey, CODE_SUCCESS, "成功", &data);
+    _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
 }

@@ -76,7 +76,7 @@ private:
     void _updateOrder(int, CThostFtdcOrderField *);
 
     // 返回通知
-    void _rspMsg(int, int, string, Json::Value* = NULL);
+    void _rspMsg(int, int, string, int = -1, Json::Value* = NULL);
 
 public:
 
