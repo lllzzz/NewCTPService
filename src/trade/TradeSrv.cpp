@@ -250,7 +250,6 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
     _logger->push("tradeTime", string(pTrade->TradeTime));
     _logger->push("ExchangeID", string(pTrade->ExchangeID));
     _logger->push("Volume", Lib::itos(pTrade->Volume));
-    _logger->push("TradeID", string(pTrade->TradeID));
     _logger->info("TradeSrv[OnRtnTrade]");
 
     Json::Value data;
