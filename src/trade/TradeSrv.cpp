@@ -647,13 +647,16 @@ void TradeSrv::qryCommissionRate(int appKey, string iid)
 {
     // 查询合约
     CThostFtdcQryInstrumentCommissionRateField req = {0};
+    // CThostFtdcQryOptionInstrCommRateField req = {0};
     strcpy(req.BrokerID, Lib::stoc(_brokerID));
     strcpy(req.InvestorID, Lib::stoc(_userID));
     strcpy(req.InstrumentID, iid.c_str());
 
     int res = _tApi->ReqQryInstrumentCommissionRate(&req, _reqID);
+    // int res = _tApi->ReqQryOptionInstrCommRate(&req, _reqID);
     _qryReq2App[_reqID] = appKey;
     _logger->request("TradeSrv[ReqQryInstrumentCommissionRate]", _reqID++, res);
+    // _logger->request("TradeSrv[ReqQryOptionInstrCommRate]", _reqID++, res);
     if (res < 0) {
         _rspMsg(appKey, res, "请求失败");
     }
@@ -679,6 +682,31 @@ void TradeSrv::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRa
     data["closeByVol"] = pInstrumentCommissionRate->CloseRatioByVolume;
     data["closeTodayByMoney"] = pInstrumentCommissionRate->CloseTodayRatioByMoney;
     data["closeTodayByVol"] = pInstrumentCommissionRate->CloseTodayRatioByVolume;
+    _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
+}
+
+void TradeSrv::OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate,
+    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    cout << pOptionInstrCommRate->InstrumentID << endl;
+    cout << nRequestID << endl;
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        _logger->error("TradeSrv[OnRspQryOptionInstrCommRate]", pRspInfo, nRequestID, bIsLast);
+        return;
+    }
+
+    int appKey = _qryReq2App[nRequestID];
+
+    Json::Value data;
+
+    data["type"] = "rate";
+    data["iid"] = pOptionInstrCommRate->InstrumentID;
+    data["openByMoney"] = pOptionInstrCommRate->OpenRatioByMoney;
+    data["openByVol"] = pOptionInstrCommRate->OpenRatioByVolume;
+    data["closeByMoney"] = pOptionInstrCommRate->CloseRatioByMoney;
+    data["closeByVol"] = pOptionInstrCommRate->CloseRatioByVolume;
+    data["closeTodayByMoney"] = pOptionInstrCommRate->CloseTodayRatioByMoney;
+    data["closeTodayByVol"] = pOptionInstrCommRate->CloseTodayRatioByVolume;
     _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
 }
 

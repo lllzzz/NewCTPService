@@ -100,8 +100,9 @@ public:
     void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
     // 手续费查询
-    void qryCommissionRate(int, string); // ReqQryInstrumentCommissionRate
+    void qryCommissionRate(int, string); // ReqQryInstrumentCommissionRate?ReqQryOptionInstrCommRate?
     void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+    void OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     // 持仓查询
     void qryPosition(int, string); // ReqQryInvestorPosition
