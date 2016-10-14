@@ -11,8 +11,9 @@ class C
 public:
     C();
     ~C();
-    
+
     static string get(string);
+    static string getCh(string);
 };
 
 

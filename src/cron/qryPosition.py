@@ -18,7 +18,7 @@ import time
 appKey = -519 #系统自己的appKey
 sender = Rds.getSender()
 rds = Rds.getRds()
-sendCh = C.get('channel_trade')
+sendCh = C.getCh('channel_trade')
 db = DB(DB.TYPE_TRADE)
 iids = re.split('/', C.get('iids'))
 num = len(iids)
@@ -72,7 +72,7 @@ def process(channel, data):
         time.sleep(1)
         send()
 
-listenCh = C.get('channel_trade_rsp') + str(appKey)
+listenCh = C.getCh('channel_trade_rsp') + str(appKey)
 srv = Service([listenCh], process)
 send()
 srv.run()

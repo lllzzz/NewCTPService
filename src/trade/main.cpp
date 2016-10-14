@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
     string host = C::get("rds_host_" + env);
     int db = Lib::stoi(C::get("rds_db_" + env));
     Redis * srv = new Redis(host, 6379, db);
-    string channel = C::get("channel_trade");
+    string channel = C::getCh("channel_trade");
     srv->asService(action, channel);
 
     cout << "TradeSrv start success!" << endl;

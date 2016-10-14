@@ -17,3 +17,9 @@ class Config():
             k, v = line.split('=')
             kv[k.strip()] = v.strip()
         return kv[key]
+
+    @staticmethod
+    def getCh(key):
+        env = Config.get('env')
+        db = Config.get('rds_db_' + env)
+        return db + ':' + C.get(key)

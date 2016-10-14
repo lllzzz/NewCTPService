@@ -13,7 +13,7 @@ MarketSpi::MarketSpi(CThostFtdcMdApi * mdApi)
     _password = C::get("market_password_" + env);
     _brokerID = C::get("market_broker_id_" + env);
     _iIDs = Lib::split(C::get("iids"), "/");
-    _channel = C::get("channel_tick");
+    _channel = C::getCh("channel_tick");
 
     int db = Lib::stoi(C::get("rds_db_" + env));
     string host = C::get("rds_host_" + env);

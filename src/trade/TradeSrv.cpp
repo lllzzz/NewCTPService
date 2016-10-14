@@ -17,7 +17,7 @@ TradeSrv::TradeSrv()
     _rds      = new Redis(host, 6379, db);
     _rdsLocal = new Redis("127.0.0.1", 6379, 1);
 
-    _channelRsp = C::get("channel_trade_rsp");
+    _channelRsp = C::getCh("channel_trade_rsp");
 
     _reqID = 1;
 

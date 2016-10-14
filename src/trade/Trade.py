@@ -35,7 +35,7 @@ class Trade():
         host = C.get('rds_host_' + env)
         db = C.get('rds_db_' + env)
         rds = Redis(host = host, port = 6379, db = db)
-        tradeChannel = C.get('channel_trade')
+        tradeChannel = C.getCh('channel_trade')
         rds.publish(tradeChannel, 'stop');
 
 
