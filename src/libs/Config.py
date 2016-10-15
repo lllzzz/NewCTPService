@@ -22,4 +22,4 @@ class Config():
     def getCh(key):
         env = Config.get('env')
         db = Config.get('rds_db_' + env)
-        return db + ':' + C.get(key)
+        return db + ':' + Config.get(key)
