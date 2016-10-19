@@ -20,14 +20,19 @@ public:
 
     ACTIONCALLBACK _callback;
     string _channel;
+
+    string _getResultAsString();
+    long long _getResultAsInt();
+    void _freeReply();
+
 public:
     Redis(string host, int port, int db);
     ~Redis();
-    string execCmd(string cmd, bool = false);
+    // string execCmd(string cmd, bool = false);
     string pop(string key);
     void set(string key, string data);
     void setnx(string key, string data);
-    string incr(string key);
+    long long incr(string key);
     string get(string key);
     void push(string key, string data);
 
