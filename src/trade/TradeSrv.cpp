@@ -14,8 +14,11 @@ TradeSrv::TradeSrv()
 
     int db      = Lib::stoi(C::get("rds_db_" + env));
     string host = C::get("rds_host_" + env);
-    _rds      = new Redis(host, 6379, db);
-    _rdsLocal = new Redis("127.0.0.1", 6379, 1);
+    _rds        = new Redis(host, 6379, db);
+    _rdsIdx = 0;
+    for (int i = 0; i < 6; i++) {
+        _rdsLocals[i] = new Redis("127.0.0.1", 6379, 1);
+    }
 
     _channelRsp = C::getCh("channel_trade_rsp");
 
@@ -129,10 +132,10 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
 
     if (type == ORDER_TYPE_IOC) {
         if (isBuy) {
-            string upper = _rdsLocal->get("UPPERLIMITPRICE_" + iid);
+            string upper = _getLocalRds()->get("UPPERLIMITPRICE_" + iid);
             price = Lib::stod(upper);
         } else {
-            string lower = _rdsLocal->get("LOWERLIMITPRICE_" + iid);
+            string lower = _getLocalRds()->get("LOWERLIMITPRICE_" + iid);
             price = Lib::stod(lower);
         }
     }
@@ -179,7 +182,7 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
     data["time"] = time;
 
     std::string jsonStr = writer.write(data);
-    _rdsLocal->push("Q_TRADE", jsonStr);
+    _getLocalRds()->push("Q_TRADE", jsonStr);
 }
 
 
@@ -236,7 +239,7 @@ void TradeSrv::_onOrder(CThostFtdcOrderField *pOrder)
     data["todoVol"] = pOrder->VolumeTotal;
 
     std::string qStr = writer.write(data);
-    _rdsLocal->push("Q_TRADE", qStr); // 记录本地数据
+    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -287,7 +290,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
     Json::FastWriter writer;
     std::string qStr = writer.write(data);
-    _rdsLocal->push("Q_TRADE", qStr); // 记录本地数据
+    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -366,12 +369,12 @@ void TradeSrv::_onCancel(CThostFtdcOrderField *pOrder)
     data["insertTime"] = pOrder->InsertTime;
     data["localTime"] = time;
     data["orderStatus"] = pOrder->OrderStatus;
-    data["currentTick"] = _rdsLocal->get("CURRENT_TICK_" + string(pOrder->InstrumentID));
+    data["currentTick"] = _getLocalRds()->get("CURRENT_TICK_" + string(pOrder->InstrumentID));
     data["cancelVol"] = pOrder->VolumeTotal;
 
     Json::FastWriter writer;
     std::string qStr = writer.write(data);
-    _rdsLocal->push("Q_TRADE", qStr); // 记录本地数据
+    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -770,10 +773,17 @@ void TradeSrv::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvest
 
 void TradeSrv::_incrCancelTimes()
 {
-    _rdsLocal->incr("CANCEL_TIMES_" + _confirmDate);
+    _getLocalRds()->incr("CANCEL_TIMES_" + _confirmDate);
 }
 
 int TradeSrv::_getCancelTimes()
 {
-    return Lib::stoi(_rdsLocal->get("CANCEL_TIMES_" + _confirmDate));
+    return Lib::stoi(_getLocalRds()->get("CANCEL_TIMES_" + _confirmDate));
+}
+
+Redis * TradeSrv::_getLocalRds()
+{
+    _rdsIdx++;
+    if (_rdsIdx >= 6) _rdsIdx = 0;
+    return _rdsLocals[_rdsIdx];
 }

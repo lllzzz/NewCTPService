@@ -34,7 +34,9 @@ private:
     CThostFtdcTraderApi * _tApi;
 
     Redis * _rds; // 用于通知的redis实例
-    Redis * _rdsLocal; // 本地redis实例
+    Redis * _rdsLocals[6]; // 本地redis实例
+    int _rdsIdx; // 本地Redis池索引
+    Redis * _getLocalRds();
 
     string _brokerID;
     string _userID;
