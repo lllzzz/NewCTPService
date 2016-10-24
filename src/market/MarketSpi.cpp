@@ -17,17 +17,14 @@ MarketSpi::MarketSpi(CThostFtdcMdApi * mdApi)
 
     int db = Lib::stoi(C::get("rds_db_" + env));
     string host = C::get("rds_host_" + env);
-    _rds = new Redis(host, 6379, db);
-    _rdsLocal = new Redis("127.0.0.1", 6379, 1);
+    Redis::initRds("m", 3, host, 6379, db);
+    Redis::initRds("ml", 3, "127.0.0.1", 6379, 1);
     _reqID = 1;
 }
 
 MarketSpi::~MarketSpi()
 {
     _mdApi = NULL;
-    // delete _rds;
-    // delete _rdsLocal;
-    // delete _logger;
     _logger->info("MarketSpi[~]");
 }
 
@@ -115,11 +112,11 @@ void MarketSpi::_saveMarketData(CThostFtdcDepthMarketDataField *data)
     tick["askvol1"] = data->AskVolume1;
 
     string jsonStr = writer.write(tick);
-    _rds->pub(_channel + iid, jsonStr);
-    _rdsLocal->set("CURRENT_TICK_" + iid, Lib::dtos(data->LastPrice));
-    _rdsLocal->set("UPPERLIMITPRICE_" + iid, Lib::dtos(data->UpperLimitPrice));
-    _rdsLocal->set("LOWERLIMITPRICE_" + iid, Lib::dtos(data->LowerLimitPrice));
-    _rdsLocal->push("Q_TICK", jsonStr);
+    Redis::getRds("m")->pub(_channel + iid, jsonStr);
+    Redis::getRds("ml")->set("CURRENT_TICK_" + iid, Lib::dtos(data->LastPrice));
+    Redis::getRds("ml")->set("UPPERLIMITPRICE_" + iid, Lib::dtos(data->UpperLimitPrice));
+    Redis::getRds("ml")->set("LOWERLIMITPRICE_" + iid, Lib::dtos(data->LowerLimitPrice));
+    Redis::getRds("ml")->push("Q_TICK", jsonStr);
 }
 
 

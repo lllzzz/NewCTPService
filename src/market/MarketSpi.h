@@ -21,8 +21,6 @@ private:
 
     CThostFtdcMdApi * _mdApi;
     Logger * _logger;
-    Redis * _rds;
-    Redis * _rdsLocal;
 
     string _brokerID;
     string _userID;

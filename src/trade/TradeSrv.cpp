@@ -14,11 +14,9 @@ TradeSrv::TradeSrv()
 
     int db      = Lib::stoi(C::get("rds_db_" + env));
     string host = C::get("rds_host_" + env);
-    _rds        = new Redis(host, 6379, db);
-    _rdsIdx = 0;
-    for (int i = 0; i < 6; i++) {
-        _rdsLocals[i] = new Redis("127.0.0.1", 6379, 1);
-    }
+
+    Redis::initRds("t", 3, host, 6379, db);
+    Redis::initRds("tl", 6, "127.0.0.1", 6379, 1);
 
     _channelRsp = C::getCh("channel_trade_rsp");
 
@@ -27,7 +25,7 @@ TradeSrv::TradeSrv()
     _cancelTimesMax = Lib::stoi(C::get("cancel_times"));
 
     // 初始化是否可以撤单
-    _rds->set("CAN_CANCEL", "1");
+    Redis::getRds("t")->set("CAN_CANCEL", "1");
 
     // 初始化交易接口
     _tApi = CThostFtdcTraderApi::CreateFtdcTraderApi(Lib::stoc(_flowPath));
@@ -107,7 +105,7 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
     if (type == ORDER_TYPE_NORMAL) { // 普通单有可能撤单，所以要判断撤单限制
         int cancelTimes = _getCancelTimes();
         if (cancelTimes >= _cancelTimesMax) {
-            _rds->set("CAN_CANCEL", "0");
+            Redis::getRds("t")->set("CAN_CANCEL", "0");
             _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "撤单已达上限，不能再下单", orderID);
             return;
         }
@@ -132,10 +130,10 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
 
     if (type == ORDER_TYPE_IOC) {
         if (isBuy) {
-            string upper = _getLocalRds()->get("UPPERLIMITPRICE_" + iid);
+            string upper = Redis::getRds("tl")->get("UPPERLIMITPRICE_" + iid);
             price = Lib::stod(upper);
         } else {
-            string lower = _getLocalRds()->get("LOWERLIMITPRICE_" + iid);
+            string lower = Redis::getRds("tl")->get("LOWERLIMITPRICE_" + iid);
             price = Lib::stod(lower);
         }
     }
@@ -182,7 +180,7 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
     data["time"] = time;
 
     std::string jsonStr = writer.write(data);
-    _getLocalRds()->push("Q_TRADE", jsonStr);
+    Redis::getRds("tl")->push("Q_TRADE", jsonStr);
 }
 
 
@@ -239,7 +237,7 @@ void TradeSrv::_onOrder(CThostFtdcOrderField *pOrder)
     data["todoVol"] = pOrder->VolumeTotal;
 
     std::string qStr = writer.write(data);
-    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
+    Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -290,7 +288,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
     Json::FastWriter writer;
     std::string qStr = writer.write(data);
-    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
+    Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -369,12 +367,12 @@ void TradeSrv::_onCancel(CThostFtdcOrderField *pOrder)
     data["insertTime"] = pOrder->InsertTime;
     data["localTime"] = time;
     data["orderStatus"] = pOrder->OrderStatus;
-    data["currentTick"] = _getLocalRds()->get("CURRENT_TICK_" + string(pOrder->InstrumentID));
+    data["currentTick"] = Redis::getRds("tl")->get("CURRENT_TICK_" + string(pOrder->InstrumentID));
     data["cancelVol"] = pOrder->VolumeTotal;
 
     Json::FastWriter writer;
     std::string qStr = writer.write(data);
-    _getLocalRds()->push("Q_TRADE", qStr); // 记录本地数据
+    Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -509,7 +507,7 @@ void TradeSrv::_rspMsg(int appKey, int err, string msg, int orderID, Json::Value
 
     Json::FastWriter writer;
     string jsonStr = writer.write(rsp);
-    _rds->pub(_channelRsp + Lib::itos(appKey), jsonStr);
+    Redis::getRds("t")->pub(_channelRsp + Lib::itos(appKey), jsonStr);
 }
 
 CThostFtdcInputOrderField TradeSrv::_createOrder(string instrumnetID, bool isBuy, int total, double price,
@@ -773,17 +771,10 @@ void TradeSrv::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvest
 
 void TradeSrv::_incrCancelTimes()
 {
-    _getLocalRds()->incr("CANCEL_TIMES_" + _confirmDate);
+    Redis::getRds("tl")->incr("CANCEL_TIMES_" + _confirmDate);
 }
 
 int TradeSrv::_getCancelTimes()
 {
-    return Lib::stoi(_getLocalRds()->get("CANCEL_TIMES_" + _confirmDate));
-}
-
-Redis * TradeSrv::_getLocalRds()
-{
-    _rdsIdx++;
-    if (_rdsIdx >= 6) _rdsIdx = 0;
-    return _rdsLocals[_rdsIdx];
+    return Lib::stoi(Redis::getRds("tl")->get("CANCEL_TIMES_" + _confirmDate));
 }

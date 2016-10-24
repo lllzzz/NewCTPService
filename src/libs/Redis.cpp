@@ -154,3 +154,26 @@ void Redis::_freeReply()
 {
     freeReplyObject(pRedisReply);
 }
+
+void Redis::initRds(string id, int num, string host, int port, int db)
+{
+    _idx[id] = 0;
+    _idxNum[id] = num;
+    std::vector<Redis *> rdsList(num);
+    for (int i = 0; i < num; ++i)
+    {
+        rdsList[i] = new Redis(host, port, db);
+    }
+    _objPool[id] = rdsList;
+}
+
+Redis * Redis::getRds(string id)
+{
+    _idx[id]++;
+    if (_idx[id] == _idxNum[id]) _idx[id] = 0;
+    return _objPool[id][_idx[id]];
+}
+
+std::map<string, std::vector<Redis *> > Redis::_objPool = std::map<string, std::vector<Redis *> >() ;
+std::map<string, int> Redis::_idx = std::map<string, int>();
+std::map<string, int> Redis::_idxNum = std::map<string, int>();

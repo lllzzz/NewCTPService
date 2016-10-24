@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <map>
 #include "Config.h"
 #include "Lib.h"
 
@@ -25,6 +26,7 @@ public:
     long long _getResultAsInt();
     void _freeReply();
 
+
 public:
     Redis(string host, int port, int db);
     ~Redis();
@@ -40,6 +42,13 @@ public:
 
     void asService(ACTIONCALLBACK, string);
     void run();
+
+
+    static std::map<string, std::vector<Redis *> > _objPool;
+    static std::map<string, int> _idx;
+    static std::map<string, int> _idxNum;
+    static void initRds(string, int, string, int, int);
+    static Redis * getRds(string);
 };
 
 #endif
