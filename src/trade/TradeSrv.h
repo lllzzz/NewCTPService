@@ -91,7 +91,7 @@ public:
     void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     // 下单/撤单
-    void trade(int, int, string, bool, bool, int, double, int); // ReqOrderInsert
+    void trade(int, int, string, bool, bool, int, double, int, bool = true); // ReqOrderInsert
     void cancel(int, int); // ReqOrderAction
     void OnRtnOrder(CThostFtdcOrderField *pOrder);
     void OnRtnTrade(CThostFtdcTradeField *pTrade);

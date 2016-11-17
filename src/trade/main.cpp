@@ -45,8 +45,9 @@ bool action(string data)
         int total    = root["total"].asInt();
         bool isBuy   = root["isBuy"].asBool();
         bool isOpen  = root["isOpen"].asBool();
+        bool isToday  = root["isToday"].asBool();
 
-        service->trade(appKey, orderID, iid, isOpen, isBuy, total, price, type);
+        service->trade(appKey, orderID, iid, isOpen, isBuy, total, price, type, isToday);
 
     }
 

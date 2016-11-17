@@ -96,7 +96,7 @@ void TradeSrv::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 }
 
 
-void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBuy, int total, double price, int type)
+void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBuy, int total, double price, int type, bool isToday)
 {
     if (_isExistOrder(appKey, orderID)) {
         _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单", orderID);
@@ -112,7 +112,8 @@ void TradeSrv::trade(int appKey, int orderID, string iid, bool isOpen, bool isBu
     }
     _initOrder(appKey, orderID, iid);
 
-    TThostFtdcOffsetFlagEnType flag = isOpen ? THOST_FTDC_OFEN_Open : THOST_FTDC_OFEN_CloseToday;
+    TThostFtdcOffsetFlagEnType closeFlag = isToday ? THOST_FTDC_OFEN_CloseToday : THOST_FTDC_OFEN_Close;
+    TThostFtdcOffsetFlagEnType flag = isOpen ? THOST_FTDC_OFEN_Open : closeFlag;
     TThostFtdcContingentConditionType condition = THOST_FTDC_CC_Immediately;
     TThostFtdcTimeConditionType timeCondition = THOST_FTDC_TC_GFD;
     TThostFtdcVolumeConditionType volumeCondition = THOST_FTDC_VC_AV;
