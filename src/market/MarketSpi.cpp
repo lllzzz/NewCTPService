@@ -16,9 +16,11 @@ MarketSpi::MarketSpi(CThostFtdcMdApi * mdApi)
     _channel = C::getCh("channel_tick");
 
     int db = Lib::stoi(C::get("rds_db_" + env));
+    int dbLocal = Lib::stoi(C::get("rds_db_local"));
     string host = C::get("rds_host_" + env);
-    Redis::initRds("m", 3, host, 6379, db);
-    Redis::initRds("ml", 3, "127.0.0.1", 6379, 1);
+    int pool = Lib::stoi(C::get("rds_pool_num"));
+    Redis::initRds("m", pool, host, 6379, db);
+    Redis::initRds("ml", pool, host, 6379, dbLocal);
     _reqID = 1;
 }
 

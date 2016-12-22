@@ -13,10 +13,11 @@ TradeSrv::TradeSrv()
     _flowPath   = C::get("flow_path_m");
 
     int db      = Lib::stoi(C::get("rds_db_" + env));
+    int dbLocal = Lib::stoi(C::get("rds_db_local"));
     string host = C::get("rds_host_" + env);
-
-    Redis::initRds("t", 3, host, 6379, db);
-    Redis::initRds("tl", 6, "127.0.0.1", 6379, 1);
+    int pool = Lib::stoi(C::get("rds_pool_num"));
+    Redis::initRds("t", pool, host, 6379, db);
+    Redis::initRds("tl", pool, host, 6379, dbLocal);
 
     _channelRsp = C::getCh("channel_trade_rsp");
 

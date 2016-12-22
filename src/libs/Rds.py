@@ -11,7 +11,10 @@ class Rds():
 
     @staticmethod
     def getLocal():
-        obj = Rds('127.0.0.1', 6379, 1)
+        env = C.get('env')
+        host = C.get('rds_host_' + env)
+        localDB = C.get('rds_db_local')
+        obj = Rds(host, 6379, localDB)
         return obj.rds
 
     @staticmethod

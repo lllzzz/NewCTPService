@@ -16,7 +16,10 @@ class Q():
     def __init__(self, key, obj):
         self.key = key
         self.obj = obj
-        self.rds = Redis(host = '127.0.0.1', port = 6379, db = 1)
+        env = C.get('env')
+        host = C.get('rds_host_' + env)
+        localDB = C.get('rds_db_local')
+        self.rds = Redis(host = host, port = 6379, db = localDB)
         self.logger = Logger()
 
     def run(self):
