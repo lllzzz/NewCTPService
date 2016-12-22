@@ -63,7 +63,6 @@ class Market():
               `ask_price1` decimal(10,2) NOT NULL DEFAULT '0.00',
               `ask_volume1` int(11) NOT NULL DEFAULT '0',
               `mtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-              PRIMARY KEY (`id`),
-              UNIQUE KEY `idx_tm` (`time`, `msec`)
+              PRIMARY KEY (`id`)
             ) ENGINE=InnoDB CHARSET=utf8;''' % (iid)
         self._db.insert(sql)
