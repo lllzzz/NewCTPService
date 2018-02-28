@@ -204,6 +204,7 @@ void TradeSrv::OnRtnOrder(CThostFtdcOrderField *pOrder)
     _logger->push("VolumeTraded", Lib::itos(pOrder->VolumeTraded));
     _logger->push("VolumeTotal", Lib::itos(pOrder->VolumeTotal));
     _logger->push("ZCETotalTradedVolume", Lib::itos(pOrder->ZCETotalTradedVolume));
+    _logger->push("OrderSysID", string(pOrder->OrderSysID));
     _logger->info("TradeSrv[OnRtnOrder]");
 
     _updateOrder(orderRef, pOrder);
@@ -237,6 +238,7 @@ void TradeSrv::_onOrder(CThostFtdcOrderField *pOrder)
     data["localTime"] = time;
     data["orderStatus"] = pOrder->OrderStatus;
     data["todoVol"] = pOrder->VolumeTotal;
+    data["orderSysID"] = pOrder->OrderSysID;
 
     std::string qStr = writer.write(data);
     Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
@@ -262,7 +264,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
     _logger->push("orderID", Lib::itos(info.orderID));
     _logger->push("orderRef", string(pTrade->OrderRef));
     _logger->push("price", Lib::dtos(pTrade->Price));
-    _logger->push("tradeID", string(pTrade->TradeID));
+    _logger->push("TradeID", string(pTrade->TradeID));
     _logger->push("tradeDate", string(pTrade->TradeDate));
     _logger->push("tradeTime", string(pTrade->TradeTime));
     _logger->push("ExchangeID", string(pTrade->ExchangeID));
@@ -287,6 +289,7 @@ void TradeSrv::OnRtnTrade(CThostFtdcTradeField *pTrade)
     data["tradeTime"] = pTrade->TradeTime;
     data["localTime"] = time;
     data["successVol"] = pTrade->Volume;
+    data["tradeID"] = pTrade->TradeID;
 
     Json::FastWriter writer;
     std::string qStr = writer.write(data);

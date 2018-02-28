@@ -56,32 +56,32 @@ class Trade():
             t, u = data['time'].split('.')
             sql = '''
                 INSERT INTO `order_log` (`appKey`, `iid`, `order_id`, `front_id`, `session_id`, `order_ref`,
-                `price`, `total`, `is_buy`, `is_open`, `srv_time`, `local_time`, `local_usec`, `type`) VALUES ('%s',
-                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
+                `price`, `total`, `is_buy`, `is_open`, `local_time`, `local_usec`, `type`) VALUES ('%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
                 data['iid'], data['orderID'], data['frontID'], data['sessionID'], data['orderRef'],
-                data['price'], data['total'], data['isBuy'], data['isOpen'], '0', self.__cTime2DBTime(t), u, self.LOG_TYPE_ACT_TRADE);
+                data['price'], data['total'], data['isBuy'], data['isOpen'], self.__cTime2DBTime(t), u, self.LOG_TYPE_ACT_TRADE);
             self._db.insert(sql)
 
         elif type == 'traded':
             t, u = data['localTime'].split('.')
             sql = '''
                 INSERT INTO `order_log` (`appKey`, `iid`, `order_id`, `front_id`, `session_id`, `order_ref`,
-                `price`, `total`, `is_buy`, `is_open`, `srv_time`, `local_time`, `local_usec`, `type`) VALUES ('%s',
-                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
+                `price`, `total`, `is_buy`, `is_open`, `srv_time`, `local_time`, `local_usec`, `type`, `trade_id`) VALUES ('%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
                 data['iid'], data['orderID'], data['frontID'], data['sessionID'], data['orderRef'],
                 data['realPrice'], data['successVol'], '-1', '-1', self.__buildDBTime(data['tradeDate'],
-                data['tradeTime']), self.__cTime2DBTime(t), u, self.LOG_TYPE_RSP_TRADED);
+                data['tradeTime']), self.__cTime2DBTime(t), u, self.LOG_TYPE_RSP_TRADED, data['tradeID']);
             self._db.update(sql)
 
         elif type == 'order':
             t, u = data['localTime'].split('.')
             sql = '''
                 INSERT INTO `order_log` (`appKey`, `iid`, `order_id`, `front_id`, `session_id`, `order_ref`,
-                `price`, `total`, `is_buy`, `is_open`, `srv_time`, `local_time`, `local_usec`, `type`) VALUES ('%s',
-                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
+                `price`, `total`, `is_buy`, `is_open`, `srv_time`, `local_time`, `local_usec`, `type`, `order_sys_id`) VALUES ('%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')''' % (data['appKey'],
                 data['iid'], data['orderID'], data['frontID'], data['sessionID'], data['orderRef'],
                 '-1', data['todoVol'], '-1', '-1', self.__buildDBTime(data['insertDate'], data['insertTime']),
-                self.__cTime2DBTime(t), u, self.LOG_TYPE_RSP_ORDER);
+                self.__cTime2DBTime(t), u, self.LOG_TYPE_RSP_ORDER, data['orderSysID']);
 
             self._db.update(sql)
 
@@ -113,10 +113,12 @@ class Trade():
                 `total` int(11) NOT NULL DEFAULT 0,
                 `is_buy` int(1) NOT NULL DEFAULT '-1',
                 `is_open` int(11) NOT NULL DEFAULT '-1',
-                `srv_time` datetime NOT NULL COMMENT '服务器返回时间',
-                `local_time` datetime NOT NULL COMMENT '发出交易指令时间',
+                `srv_time` datetime NOT NULL DEFAULT 0 COMMENT '服务器返回时间',
+                `local_time` datetime NOT NULL DEFAULT 0 COMMENT '发出交易指令时间',
                 `local_usec` int(11) NOT NULL DEFAULT '0',
                 `type` int(11) NOT NULL DEFAULT '0',
+                `trade_id` varchar(100) NOT NULL DEFAULT '',
+                `order_sys_id` varchar(100) NOT NULL DEFAULT '',
                 `mtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`id`),
                 KEY `idx_front_session_ref` (`front_id`,`session_id`,`order_ref`)
