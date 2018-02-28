@@ -113,6 +113,8 @@ void MarketSpi::_saveMarketData(CThostFtdcDepthMarketDataField *data)
     tick["ask1"] = data->AskPrice1;
     tick["askvol1"] = data->AskVolume1;
 
+    _logger->info("MarketSpi[TICK]");
+
     string jsonStr = writer.write(tick);
     Redis::getRds("m")->pub(_channel + iid, jsonStr);
     Redis::getRds("ml")->set("CURRENT_TICK_" + iid, Lib::dtos(data->LastPrice));
