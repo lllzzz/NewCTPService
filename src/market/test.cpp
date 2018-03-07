@@ -1,7 +1,8 @@
 #include <string>
 #include <iostream>
 #include <cstring>
-#include "../libs/Config.h"
+#include "../common/Config.h"
+#include <glog/logging.h>
 
 using namespace std;
 
@@ -16,6 +17,10 @@ int main(int argc, char const *argv[])
     ENV = argv[1];
     cout << ENV << endl;
 
+    google::InitGoogleLogging("TEST");
+    google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
+    LOG(INFO) << "TEST";
+
     cout << Config::get("mdFront") << endl;
     cout << Config::get("path", "log") << endl;
     cout << Config::get("abc") << endl;
@@ -23,5 +28,6 @@ int main(int argc, char const *argv[])
     cout << arr[0] << endl;
     cout << arr.size() << endl;
 
+    google::ShutdownGoogleLogging();
     return 0;
 }

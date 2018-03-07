@@ -14,7 +14,7 @@
     "path": {
         "mdFlow": "/home/dev/srv/CTPService/flow/m/",
         "tdFlow": "/home/dev/srv/CTPService/flow/t/",
-        "log": "/home/dev/srv/CTPService/logs/",
+        "log": "/home/dev/src/CTPService/logs/",
         "pid": "/home/dev/srv/CTPService/pid"
     }
 }
