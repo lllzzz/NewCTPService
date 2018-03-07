@@ -1,0 +1,20 @@
+{
+    "redis": {
+        "host": "127.0.0.1",
+        "db": 1
+    },
+    "iids": ["hc1805"],
+    "mdFront": "tcp://180.168.146.187:10031",
+    "tdFront": "tcp://180.168.146.187:10030",
+    "tFront": "",
+    "brockerId": "9999",
+    "userId": "058462",
+    "passwd": "Abc518131!",
+
+    "path": {
+        "mdFlow": "/home/dev/srv/CTPService/flow/m/",
+        "tdFlow": "/home/dev/srv/CTPService/flow/t/",
+        "log": "/home/dev/srv/CTPService/logs/",
+        "pid": "/home/dev/srv/CTPService/pid"
+    }
+}

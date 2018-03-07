@@ -1,20 +1,52 @@
 #include "Config.h"
 
-C::C(){}
-C::~C(){}
+Config::Config(){}
+Config::~Config(){}
 
-string C::get(string key)
+Json::Value json;
+
+void Config::readJsonFile()
 {
-    string path = "../etc/config.ini";
-    parseIniFile(path);
-    string val = getOptionToString(key);
-    return val;
+    string path = "../etc/config." + ENV + ".json";
+    cout << path << endl;
+
+    Json::Reader reader;
+
+    std::ifstream in;
+    in.open(path.c_str(), std::ios::binary);
+
+    bool parsingSuccessful = reader.parse(in, json);
+    in.close();
+    if (!parsingSuccessful) {
+        cout << "解析配置文件错误: " << reader.getFormattedErrorMessages() << endl;
+        exit(1);
+    }
 }
 
-string C::getCh(string key)
+vector<string> Config::getV(string key)
 {
-    string env = C::get("env");
-    string db = C::get("rds_db_" + env);
-    string ch = C::get(key);
-    return db + ":" + ch;
+    if (!json) readJsonFile();
+    int itemSize = json[key].size();
+    if (itemSize >= 1) {
+        vector<string> vec;
+        for (int i = 0; i < itemSize; i++) {
+            vec.push_back(json[key][i].asString());
+        }
+        return vec;
+    } else {
+        cout << "获取失败" << endl;
+        exit(1);
+    }
+}
+
+string Config::get(string key)
+{
+    if (!json) readJsonFile();
+    return json[key].asString();
+}
+
+string Config::get(string section, string key)
+{
+    if (!json) readJsonFile();
+    return json[section][key].asString();
 }
