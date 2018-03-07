@@ -6,6 +6,7 @@ rds_db_online = 1
 rds_host_dev = 127.0.0.1
 rds_db_dev = 2
 rds_db_local = 1
+rds_pool_num = 2
 
 channel_tick = tick_
 channel_trade = trade
