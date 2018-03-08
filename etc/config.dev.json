@@ -8,14 +8,14 @@
     "mdFront": "tcp://180.168.146.187:10031",
     "tdFront": "tcp://180.168.146.187:10030",
     "tFront": "",
-    "brockerId": "9999",
+    "brokerId": "9999",
     "userId": "058462",
     "passwd": "Abc518131!",
 
     "path": {
-        "mdFlow": "/home/dev/srv/CTPService/flow/m/",
-        "tdFlow": "/home/dev/srv/CTPService/flow/t/",
+        "mdFlow": "/home/dev/src/CTPService/flow/m/",
+        "tdFlow": "/home/dev/src/CTPService/flow/t/",
         "log": "/home/dev/src/CTPService/logs/",
-        "pid": "/home/dev/srv/CTPService/pid"
+        "pid": "/home/dev/src/CTPService/pid"
     }
 }

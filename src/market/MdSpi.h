@@ -1,40 +1,28 @@
-#ifndef MARK_SPI_H
-#define MARK_SPI_H
+#ifndef MDSPI_H
+#define MDSPI_H
 
-#include "../global.h"
-#include "../../include/ThostFtdcMdApi.h"
-#include "../libs/Redis.h"
-#include <map>
+#include <glog/logging.h>
+#include <vector>
+#include "../ctp/ThostFtdcMdApi.h"
+#include "../message/MessageService.h"
+#include "../common/Config.h"
+#include "../message/MessageTunnel.h"
 
 using namespace std;
 
-typedef struct trade_hm
-{
-    int hour;
-    int min;
 
-} TRADE_HM;
-
-class MarketSpi : public CThostFtdcMdSpi
+class MdSpi: public CThostFtdcMdSpi
 {
 private:
 
     CThostFtdcMdApi * _mdApi;
-    Logger * _logger;
 
-    string _brokerID;
-    string _userID;
-    string _password;
-    std::vector<string> _iIDs;
-
-    string _channel;
     int _reqID;
-    void _saveMarketData(CThostFtdcDepthMarketDataField *);
 
 public:
 
-    MarketSpi(CThostFtdcMdApi *);
-    ~MarketSpi();
+    MdSpi(CThostFtdcMdApi *);
+    ~MdSpi();
 
     void OnFrontConnected();
     void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,

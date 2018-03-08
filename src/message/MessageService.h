@@ -11,8 +11,8 @@
 #include <hiredis/hiredis.h>
 #include <glog/logging.h>
 #include "MessageHandler.h"
-#include "Tool.h"
-#include "Config.h"
+#include "../common/Tool.h"
+#include "../common/Config.h"
 
 /**
  *
@@ -32,6 +32,10 @@ class MessageService
 {
 private:
 
+    MessageService();
+
+    static MessageService* instance;
+
     std::map<string, MessageHandler*> _handlerMap;
 
     redisContext* redisHandler;
@@ -39,13 +43,13 @@ private:
 
 
 public:
-    MessageService();
     ~MessageService();
+
+    static MessageService* getInstance();
 
     void fire(string, Json::Value);
     void run();
     void addHandler(MessageHandler*);
 };
-
 
 #endif

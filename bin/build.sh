@@ -5,4 +5,4 @@
 
 
 
-g++ -o test ../src/market/test.cpp ../src/common/*.cpp -ljsoncpp -lglog -lhiredis
+g++ -o test ../src/market/test.cpp ../src/message/*.cpp ../src/common/*.cpp -ljsoncpp -lglog -lhiredis

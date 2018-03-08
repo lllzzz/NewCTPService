@@ -1,5 +1,7 @@
 #include "MessageService.h"
 
+MessageService* MessageService::instance = NULL;
+
 MessageService::MessageService()
 {
     // 建立Redis链接
@@ -32,6 +34,13 @@ MessageService::~MessageService()
 {
     delete redisHandler;
     delete redisRet;
+}
+
+MessageService* MessageService::getInstance()
+{
+    if (NULL == instance)
+        instance = new MessageService();
+    return instance;
 }
 
 void MessageService::fire(string msgName, Json::Value data)

@@ -7,13 +7,12 @@ Json::Value json;
 
 void Config::readJsonFile()
 {
-    string path = "../etc/config." + ENV + ".json";
-    cout << "配置地址: " << path << endl;
+    cout << "配置地址: " << CONFIG_PATH << endl;
 
     Json::Reader reader;
 
     std::ifstream in;
-    in.open(path.c_str(), std::ios::binary);
+    in.open(CONFIG_PATH.c_str(), std::ios::binary);
 
     bool parsingSuccessful = reader.parse(in, json);
     in.close();

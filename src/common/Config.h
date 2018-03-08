@@ -11,7 +11,7 @@
 
 using namespace std;
 
-extern string ENV;
+extern string CONFIG_PATH;
 
 class Config
 {

@@ -3,8 +3,8 @@
 #include <cstring>
 #include <glog/logging.h>
 #include "../common/Config.h"
-#include "../common/MessageService.h"
-#include "../common/MessageHandler.h"
+#include "../message/MessageService.h"
+#include "../message/MessageHandler.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
     // cout << arr[0] << endl;
     // cout << arr.size() << endl;
 
-    MessageService msgSrv = MessageService();
+    MessageService* msgSrv = MessageService::getInstance();
 
     // Json::Value json;
     // json["abc"] = 1;
@@ -38,9 +38,9 @@ int main(int argc, char const *argv[])
 
     string name = "ABC";
     MessageHandler* msg = new MessageTestHandler(name);
-    msgSrv.addHandler(msg);
+    msgSrv->addHandler(msg);
 
-    msgSrv.run();
+    msgSrv->run();
 
     google::ShutdownGoogleLogging();
     return 0;
