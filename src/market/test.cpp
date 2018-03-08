@@ -1,8 +1,9 @@
 #include <string>
 #include <iostream>
 #include <cstring>
-#include "../common/Config.h"
 #include <glog/logging.h>
+#include "../common/Config.h"
+#include "../common/MessageService.h"
 
 using namespace std;
 
@@ -15,18 +16,24 @@ int main(int argc, char const *argv[])
         return 1;
     }
     ENV = argv[1];
-    cout << ENV << endl;
+    cout << "当前环境: " << ENV << endl;
 
     google::InitGoogleLogging("TEST");
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
-    LOG(INFO) << "TEST";
+    // LOG(INFO) << "TEST";
 
-    cout << Config::get("mdFront") << endl;
-    cout << Config::get("path", "log") << endl;
-    cout << Config::get("abc") << endl;
-    std::vector<string> arr = Config::getV("iids");
-    cout << arr[0] << endl;
-    cout << arr.size() << endl;
+    // cout << Config::get("mdFront") << endl;
+    // cout << Config::get("path", "log") << endl;
+    // cout << Config::get("abc") << endl;
+    // std::vector<string> arr = Config::getV("iids");
+    // cout << arr[0] << endl;
+    // cout << arr.size() << endl;
+
+    MessageService msgSrv = MessageService();
+
+    Json::Value json;
+    json["abc"] = 1;
+    msgSrv.fire("HAHA", json);
 
     google::ShutdownGoogleLogging();
     return 0;

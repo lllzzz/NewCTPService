@@ -8,7 +8,7 @@ Json::Value json;
 void Config::readJsonFile()
 {
     string path = "../etc/config." + ENV + ".json";
-    cout << "配置地址:" << path << endl;
+    cout << "配置地址: " << path << endl;
 
     Json::Reader reader;
 
