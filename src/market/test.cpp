@@ -32,9 +32,9 @@ int main(int argc, char const *argv[])
 
     MessageService msgSrv = MessageService();
 
-    Json::Value json;
-    json["abc"] = 1;
-    msgSrv.fire("HAHA", json);
+    // Json::Value json;
+    // json["abc"] = 1;
+    // msgSrv.fire("HAHA", json);
 
     string name = "ABC";
     MessageHandler* msg = new MessageTestHandler(name);

@@ -33,14 +33,14 @@ public:
         return _messageName;
     }
 
-    virtual void process()=0;
+    virtual bool process(string)=0;
 };
 
 class MessageTestHandler: public MessageHandler
 {
 public:
     MessageTestHandler(string name):MessageHandler(name) {};
-    void process();
+    bool process(string);
 };
 
 #endif
