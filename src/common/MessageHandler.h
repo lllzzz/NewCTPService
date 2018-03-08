@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <jsoncpp/json/json.h>
+#include <glog/logging.h>
 
 using namespace std;
 
@@ -18,20 +19,28 @@ private:
     string _messageName;
 
 public:
-    
-    MessageHandler(): _messageName("")
+
+    MessageHandler(string name)
+    {
+        _messageName = name;
+    };
+
+    ~MessageHandler()
     {};
 
-    ~MessageHandler() 
-    {};
-
-    string getName() 
+    string getName()
     {
         return _messageName;
     }
 
-    virtual void fire();
+    virtual void process()=0;
 };
 
+class MessageTestHandler: public MessageHandler
+{
+public:
+    MessageTestHandler(string name):MessageHandler(name) {};
+    void process();
+};
 
 #endif

@@ -10,7 +10,7 @@
 #include <jsoncpp/json/json.h>
 #include <hiredis/hiredis.h>
 #include <glog/logging.h>
-// #include "MessageHandler.h"
+#include "MessageHandler.h"
 #include "Tool.h"
 #include "Config.h"
 
@@ -32,7 +32,7 @@ class MessageService
 {
 private:
 
-    // std::map<string, MessageHandler> _handlerMap;
+    std::map<string, MessageHandler*> _handlerMap;
 
     redisContext* redisHandler;
     redisReply* redisRet;
@@ -44,7 +44,7 @@ public:
 
     void fire(string, Json::Value);
     void run();
-    // void addHandler(MessageHandler);
+    void addHandler(MessageHandler*);
 };
 
 

@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include "../common/Config.h"
 #include "../common/MessageService.h"
+#include "../common/MessageHandler.h"
 
 using namespace std;
 
@@ -34,6 +35,12 @@ int main(int argc, char const *argv[])
     Json::Value json;
     json["abc"] = 1;
     msgSrv.fire("HAHA", json);
+
+    string name = "ABC";
+    MessageHandler* msg = new MessageTestHandler(name);
+    msgSrv.addHandler(msg);
+
+    msgSrv.run();
 
     google::ShutdownGoogleLogging();
     return 0;

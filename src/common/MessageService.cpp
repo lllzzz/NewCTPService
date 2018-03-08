@@ -27,6 +27,8 @@ MessageService::MessageService()
     LOG(INFO) << "REDIS SELECT DB";
     freeReplyObject(redisRet);
 
+    _handlerMap = map<string, MessageHandler*>();
+
     cout << "消息服务初始化完成..." << endl;
 }
 
@@ -41,6 +43,18 @@ void MessageService::fire(string msgName, Json::Value data)
     Json::FastWriter writer;
     string dataStr = writer.write(data);
     LOG(INFO) << "FIRE" << "|" << msgName << "|" << dataStr;
+    // 消息发送
     redisRet = (redisReply*)redisCommand(redisHandler, "PUBLISH %s %s", msgName.c_str(), dataStr.c_str());
     freeReplyObject(redisRet);
+}
+
+void MessageService::addHandler(MessageHandler* handler)
+{
+    _handlerMap[handler->getName()] = handler;
+}
+
+void MessageService::run()
+{
+    string name = "ABC";
+    _handlerMap[name]->process();
 }
