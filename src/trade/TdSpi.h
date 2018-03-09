@@ -27,9 +27,9 @@ private:
 
     static TdSpi* instance;
 
-    std::map<string, MessageProcesser*> _processerMap;
+    std::map<int, MessageProcesser*> _processerMap;
 
-    int _reqID;
+    int _reqId;
 
     string _brokerId;
     string _userId;
@@ -37,6 +37,9 @@ private:
     int _frontID;
     int _sessionID;
     int _maxOrderRef;
+
+    // 清理MessageProcesser对象
+    void _clearProcesser(int);
 
     // string _confirmDate;
     // int _cancelTimesMax;

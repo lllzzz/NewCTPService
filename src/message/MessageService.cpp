@@ -118,8 +118,6 @@ void MessageService::run()
         if (redisRet->elements >= 3) {
             name = string(redisRet->element[1]->str);
             data = string(redisRet->element[2]->str);
-            cout << name << endl;
-            cout << data << endl;
             LOG(INFO) << "LISTEN DATA|" << name << "|" << data;
             freeReplyObject(redisRet);
             if (!_handlerMap[name]->process(data)) {

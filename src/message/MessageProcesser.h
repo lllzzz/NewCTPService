@@ -20,15 +20,15 @@ protected:
 
 public:
 
-    MessageProcesser(string id)
-    {
+    int tdReqId;
+
+    MessageProcesser(string id) {
         _id = id;
     };
 
     ~MessageProcesser() {};
 
-    string getId()
-    {
+    string getId() {
         return _id;
     }
 

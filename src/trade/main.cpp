@@ -15,11 +15,12 @@ int main(int argc, char const *argv[])
     }
     CONFIG_PATH = argv[1];
 
-    google::InitGoogleLogging("MARKET");
+    google::InitGoogleLogging("TRADE");
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
 
     MessageService* msgSrv = MessageService::getInstance();
     msgSrv->addHandler(new MessageNormalTradeHandler(NORMAL_TRADE));
+    TdSpi::getInstance();
     cout << "Trade服务启动..." << endl;
     msgSrv->run();
 

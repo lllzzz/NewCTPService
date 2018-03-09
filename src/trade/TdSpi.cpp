@@ -11,13 +11,20 @@ TdSpi* TdSpi::getInstance()
 
 void TdSpi::addProcesser(MessageProcesser* processer)
 {
-    _processerMap[processer->getId()] = processer;
+    processer->tdReqId = _reqId++;
+    _processerMap[processer->tdReqId] = processer;
 }
+
+void TdSpi::_clearProcesser(int reqId)
+{
+    _processerMap.erase(reqId);
+}
+
 
 TdSpi::TdSpi()
 {
-    _reqID = 1;
-    _processerMap = map<string, MessageProcesser*>();
+    _reqId = 1;
+    _processerMap = map<int, MessageProcesser*>();
 
     string tdFlow = Config::get("path", "tdFlow");
     string tdFront = Config::get("tdFront");
@@ -47,9 +54,9 @@ void TdSpi::OnFrontConnected()
     strcpy(req.UserID, _userId.c_str());
     strcpy(req.Password, passwd.c_str());
 
-    int res = _tApi->ReqUserLogin(&req, _reqID);
+    int res = _tApi->ReqUserLogin(&req, _reqId++);
 
-    LOG(INFO) << "Request Login" << "|" << _reqID++ << "|" << res;
+    LOG(INFO) << "Request Login" << "|" << _reqId << "|" << res;
 }
 
 
@@ -82,9 +89,9 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
     strcpy(req.ConfirmDate, Tool::getDateTime("%Y%m%d").c_str());
     strcpy(req.ConfirmTime, Tool::getDateTime("%H:%M:%S").c_str());
 
-    int res = _tApi->ReqSettlementInfoConfirm(&req, _reqID);
+    int res = _tApi->ReqSettlementInfoConfirm(&req, _reqId++);
 
-    LOG(INFO) << "Request Confirm" << "|" << _reqID++ << "|" << res;
+    LOG(INFO) << "Request Confirm" << "|" << _reqId << "|" << res;
 }
 
 
@@ -107,6 +114,7 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 
     // _confirmDate = string(pSettlementInfoConfirm->ConfirmDate);
 }
+
 
 
 // void TdSpi::trade(int appKey, int orderID, string iid, bool isOpen, bool isBuy, int total, double price, int type, bool isToday)
@@ -636,7 +644,7 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 //     sprintf(order.OrderRef, "%d", _maxOrderRef);
 
 //     ///请求编号
-//     // _reqID++;
+//     // _reqId++;
 //     order.RequestID = _maxOrderRef;
 
 //     // order.GTDDate = ;///GTD日期
@@ -670,11 +678,11 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 //     strcpy(req.InvestorID, Lib::stoc(_userID));
 //     strcpy(req.InstrumentID, iid.c_str());
 
-//     int res = _tApi->ReqQryInstrumentCommissionRate(&req, _reqID);
-//     // int res = _tApi->ReqQryOptionInstrCommRate(&req, _reqID);
-//     _qryReq2App[_reqID] = appKey;
-//     _logger->request("TdSpi[ReqQryInstrumentCommissionRate]", _reqID++, res);
-//     // _logger->request("TdSpi[ReqQryOptionInstrCommRate]", _reqID++, res);
+//     int res = _tApi->ReqQryInstrumentCommissionRate(&req, _reqId);
+//     // int res = _tApi->ReqQryOptionInstrCommRate(&req, _reqId);
+//     _qryReq2App[_reqId] = appKey;
+//     _logger->request("TdSpi[ReqQryInstrumentCommissionRate]", _reqId++, res);
+//     // _logger->request("TdSpi[ReqQryOptionInstrCommRate]", _reqId++, res);
 //     if (res < 0) {
 //         _rspMsg(appKey, res, "请求失败");
 //     }
@@ -737,9 +745,9 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 //     strcpy(req.InvestorID, Lib::stoc(_userID));
 //     strcpy(req.InstrumentID, iid.c_str());
 
-//     int res = _tApi->ReqQryInvestorPosition(&req, _reqID);
-//     _qryReq2App[_reqID] = appKey;
-//     _logger->request("TdSpi[ReqQryInvestorPosition]", _reqID++, res);
+//     int res = _tApi->ReqQryInvestorPosition(&req, _reqId);
+//     _qryReq2App[_reqId] = appKey;
+//     _logger->request("TdSpi[ReqQryInvestorPosition]", _reqId++, res);
 //     if (res < 0) {
 //         _rspMsg(appKey, res, "请求失败");
 //     }
