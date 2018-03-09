@@ -5,6 +5,7 @@ kLineSrv
 marketSrv
 marketService
 tradeSrv
+tradeService
 tradeLogicSrv
 tradeStrategySrv
 readCsvSendToTick

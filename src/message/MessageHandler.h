@@ -9,12 +9,13 @@
 #include <vector>
 #include <jsoncpp/json/json.h>
 #include <glog/logging.h>
+#include "MessageProcesser.h"
 
 using namespace std;
 
 class MessageHandler
 {
-private:
+protected:
 
     string _messageName;
 
@@ -33,26 +34,13 @@ public:
     }
 
     virtual bool process(string)=0;
-    virtual void request(Json::Value)=0;
 };
 
 class MessageNormalTradeHandler: public MessageHandler
 {
-private:
-
-    string _orderId;
-    string _iid;
-    double _price;
-    int _total;
-    bool _isBuy;
-    bool _isOpen;
-    bool _isToday;
-
 public:
     MessageNormalTradeHandler(string name):MessageHandler(name) {};
     bool process(string);
-    void request(Json::Value);
-    string getOrderId();
 };
 
 #endif

@@ -1,71 +1,28 @@
-#include "TradeSrv.h"
+#include "TdSpi.h"
+#include "../common/Config.h"
+#include "../message/MessageHandler.h"
+#include "../message/MessageTunnel.h"
 
-TradeSrv * service;
+using namespace std;
 
-bool action(string);
+string CONFIG_PATH;
 
 int main(int argc, char const *argv[])
 {
-    service = new TradeSrv();
+    if (argc <= 1) {
+        cout << "请指定配置文件路径" << endl;
+        return 1;
+    }
+    CONFIG_PATH = argv[1];
 
-    // 服务化
-    string env = C::get("env");
-    string host = C::get("rds_host_" + env);
-    int db = Lib::stoi(C::get("rds_db_" + env));
-    Redis * srv = new Redis(host, 6379, db);
-    string channel = C::getCh("channel_trade");
-    srv->asService(action, channel);
+    google::InitGoogleLogging("MARKET");
+    google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
 
-    cout << "TradeSrv start success!" << endl;
-    srv->run();
-    cout << "TradeSrv stop success!" << endl;
+    MessageService* msgSrv = MessageService::getInstance();
+    msgSrv->addHandler(new MessageNormalTradeHandler(NORMAL_TRADE));
+    cout << "Trade服务启动..." << endl;
+    msgSrv->run();
 
     return 0;
-}
-
-bool action(string data)
-{
-    if (data == "stop") {
-        if (service) delete service;
-        return false;
-    }
-
-    Json::Reader reader;
-    Json::Value root;
-    reader.parse(data, root, false);
-
-    string action = root["action"].asString();
-    int appKey = root["appKey"].asInt();
-
-    if (action == "trade") {
-        int orderID  = root["orderID"].asInt();
-        string iid   = root["iid"].asString();
-        int type     = root["type"].asInt();
-        double price = root["price"].asDouble();
-        int total    = root["total"].asInt();
-        bool isBuy   = root["isBuy"].asBool();
-        bool isOpen  = root["isOpen"].asBool();
-        bool isToday  = root["isToday"].asBool();
-
-        service->trade(appKey, orderID, iid, isOpen, isBuy, total, price, type, isToday);
-
-    }
-
-    if (action == "cancel") {
-        int orderID = root["orderID"].asInt();
-        service->cancel(appKey, orderID);
-    }
-
-    if (action == "qryRate") {
-        string iid = root["iid"].asString();
-        service->qryCommissionRate(appKey, iid);
-    }
-
-    if (action == "qryPosition") {
-        string iid = root["iid"].asString();
-        service->qryPosition(appKey, iid);
-    }
-
-    return true;
 }
 
