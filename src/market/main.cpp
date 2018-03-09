@@ -8,27 +8,29 @@ string CONFIG_PATH;
 CThostFtdcMdApi * mApi;
 // string pidPath;
 
-// void shutdown(int sig)
-// {
-//     mApi->Release();
-//     remove(pidPath.c_str());
-//     cout << "MarketSrv stop success!" << endl;
-// }
+void shutdown(int sig)
+{
+    mApi->Release();
+    string pidPath = Config::get("path", "pid");
+    remove(pidPath.c_str());
+    LOG(INFO) << "Market Stop";
+    google::ShutdownGoogleLogging();
+}
 
 int main(int argc, char const *argv[])
 {
-    // signal(30, shutdown);
-    // ofstream pid;
-    // pidPath = C::get("pid_path");
-    // pid.open(pidPath.c_str(), ios::out);
-    // pid << getpid();
-    // pid.close();
-
     if (argc <= 1) {
         cout << "请指定配置文件路径" << endl;
         return 1;
     }
     CONFIG_PATH = argv[1];
+
+    signal(30, shutdown);
+    ofstream pid;
+    string pidPath = Config::get("path", "pid");
+    pid.open(pidPath.c_str(), ios::out);
+    pid << getpid();
+    pid.close();
 
     google::InitGoogleLogging("MARKET");
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());

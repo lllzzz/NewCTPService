@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -11,6 +12,8 @@ class Tool
 public:
 
     static int s2i(string);
+    static string d2s(double);
+    static string getDateTime(string);
 
     Tool() {};
     ~Tool() {};

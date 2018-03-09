@@ -40,11 +40,12 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 {
     LOG(INFO) << "On Login";
     if (pRspInfo && pRspInfo->ErrorID != 0) {
-        LOG(INFO) << "ERROR" << "|" 
+        LOG(INFO) << "ERROR" << "|"
             << pRspInfo->ErrorID << "|"
             << pRspInfo->ErrorMsg << "|"
             << nRequestID << "|"
             << bIsLast;
+        exit(1);
     }
 
     vector<string> iids = Config::getV("iids");
@@ -68,21 +69,23 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 {
     LOG(INFO) << "On Sub Data";
     if (pRspInfo && pRspInfo->ErrorID != 0) {
-        LOG(INFO) << "ERROR" << "|" 
+        LOG(INFO) << "ERROR" << "|"
             << pRspInfo->ErrorID << "|"
             << pRspInfo->ErrorMsg << "|"
             << nRequestID << "|"
             << bIsLast;
+        exit(1);
     }
 }
 
 void MdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On ERROR" << "|" 
+    LOG(INFO) << "On ERROR" << "|"
         << pRspInfo->ErrorID << "|"
         << pRspInfo->ErrorMsg << "|"
         << nRequestID << "|"
         << bIsLast;
+    exit(1);
 }
 
 /**
@@ -114,11 +117,16 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     tick["ask1"] = pDepthMarketData->AskPrice1;
     tick["askvol1"] = pDepthMarketData->AskVolume1;
 
-    LOG(INFO) << "Tick Info" << "|" 
+    LOG(INFO) << "Tick Info" << "|"
         << tick["iid"] << "|"
         << tick["price"];
 
     msgSrv->fire(TICK + iid, tick);
+
+    Cache* cache = Cache::getInstance();
+    cache->set(CACHE_KEY_IID_LAST_PRICE + iid, Tool::d2s(pDepthMarketData->LastPrice));
+    cache->set(CACHE_KEY_IID_UPPER_PRICE + iid, Tool::d2s(pDepthMarketData->UpperLimitPrice));
+    cache->set(CACHE_KEY_IID_LOWER_PRICE + iid, Tool::d2s(pDepthMarketData->LowerLimitPrice));
 
 }
 

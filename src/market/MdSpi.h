@@ -5,11 +5,11 @@
 #include <vector>
 #include "../ctp/ThostFtdcMdApi.h"
 #include "../message/MessageService.h"
-#include "../common/Config.h"
 #include "../message/MessageTunnel.h"
+#include "../common/Config.h"
+#include "../common/Cache.h"
 
 using namespace std;
-
 
 class MdSpi: public CThostFtdcMdSpi
 {
