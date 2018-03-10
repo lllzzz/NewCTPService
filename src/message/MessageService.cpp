@@ -122,7 +122,6 @@ void MessageService::run()
             freeReplyObject(redisRet);
             if (!_handlerMap[name]->process(data)) {
                 LOG(INFO) << "HANDLER FAILED";
-                break;
             }
         } else {
             freeReplyObject(redisRet);

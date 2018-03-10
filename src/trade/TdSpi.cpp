@@ -115,95 +115,83 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
     // _confirmDate = string(pSettlementInfoConfirm->ConfirmDate);
 }
 
-
-
-// void TdSpi::trade(int appKey, int orderID, string iid, bool isOpen, bool isBuy, int total, double price, int type, bool isToday)
+// bool TdSpi::_checkReqExist(int tdReqId)
 // {
-//     if (_isExistOrder(appKey, orderID)) {
-//         _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单", orderID);
-//         return;
+//     std::vector<int>::iterator it = find(_reqIdVec.begin(), _reqIdVec.end(), tdReqId);
+//     if (it != _reqIdVec.end()) {
+//         return true;
 //     }
-//     if (type == ORDER_TYPE_NORMAL) { // 普通单有可能撤单，所以要判断撤单限制
-//         int cancelTimes = _getCancelTimes();
-//         if (cancelTimes >= _cancelTimesMax) {
-//             Redis::getRds("t")->set("CAN_CANCEL", "0");
-//             _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "撤单已达上限，不能再下单", orderID);
-//             return;
-//         }
-//     }
-//     _initOrder(appKey, orderID, iid);
+//     return false;
 
-//     TThostFtdcOffsetFlagEnType closeFlag = isToday ? THOST_FTDC_OFEN_CloseToday : THOST_FTDC_OFEN_Close;
-//     TThostFtdcOffsetFlagEnType flag = isOpen ? THOST_FTDC_OFEN_Open : closeFlag;
-//     TThostFtdcContingentConditionType condition = THOST_FTDC_CC_Immediately;
-//     TThostFtdcTimeConditionType timeCondition = THOST_FTDC_TC_GFD;
-//     TThostFtdcVolumeConditionType volumeCondition = THOST_FTDC_VC_AV;
-//     TThostFtdcOrderPriceTypeType priceType = THOST_FTDC_OPT_LimitPrice;
-
-//     if (type == ORDER_TYPE_FOK) {
-//         timeCondition = THOST_FTDC_TC_IOC;
-//         volumeCondition = THOST_FTDC_VC_CV;
-//     }
-
-//     if (type == ORDER_TYPE_FAK) {
-//         timeCondition = THOST_FTDC_TC_IOC;
-//         volumeCondition = THOST_FTDC_VC_AV;
-//     }
-
-//     if (type == ORDER_TYPE_IOC) {
-//         if (isBuy) {
-//             string upper = Redis::getRds("tl")->get("UPPERLIMITPRICE_" + iid);
-//             price = Lib::stod(upper);
-//         } else {
-//             string lower = Redis::getRds("tl")->get("LOWERLIMITPRICE_" + iid);
-//             price = Lib::stod(lower);
-//         }
-//     }
-
-//     _logger->push("appKey", Lib::itos(appKey));
-//     _logger->push("orderID", Lib::itos(orderID));
-//     _logger->push("orderRef", Lib::itos(_maxOrderRef));
-//     _logger->push("iid", iid);
-//     _logger->push("isOpen", Lib::itos(isOpen));
-//     _logger->push("isBuy", Lib::itos(isBuy));
-//     _logger->push("total", Lib::itos(total));
-//     _logger->push("price", Lib::dtos(price));
-//     _logger->push("type", Lib::itos(type));
-//     _logger->info("TdSpi[trade]");
-
-//     CThostFtdcInputOrderField order = _createOrder(iid, isBuy, total, price, flag,
-//             THOST_FTDC_HFEN_Speculation, THOST_FTDC_OPT_LimitPrice, timeCondition, volumeCondition, condition);
-
-//     int tryTimes = 3;
-//     while (tryTimes--) {
-//         int res = _tApi->ReqOrderInsert(&order, _maxOrderRef);
-//         _logger->request("TdSpi[ReqOrderInsert]", _maxOrderRef, res);
-//         if (res == 0) break;
-//         if (tryTimes == 0 && res < 0) {
-//             _rspMsg(appKey, res, "发送订单失败", orderID);
-//         }
-//     }
-
-//     Json::FastWriter writer;
-//     Json::Value data;
-
-//     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
-//     data["type"] = "trade";
-//     data["appKey"] = appKey;
-//     data["orderID"] = orderID;
-//     data["frontID"] = _frontID;
-//     data["sessionID"] = _sessionID;
-//     data["orderRef"] = _maxOrderRef;
-//     data["iid"] = iid;
-//     data["price"] = price;
-//     data["total"] = total;
-//     data["isBuy"] = (int)isBuy;
-//     data["isOpen"] = (int)isOpen;
-//     data["time"] = time;
-
-//     std::string jsonStr = writer.write(data);
-//     Redis::getRds("tl")->push("Q_TRADE", jsonStr);
 // }
+
+int TdSpi::trade(int tdReqId, string iid, 
+    bool isOpen, bool isBuy, int total, double price, bool isToday, 
+    TThostFtdcTimeConditionType timeCondition,
+    TThostFtdcVolumeConditionType volumeCondition)
+{
+
+    LOG(INFO) << "TRADE" << "|"
+        << tdReqId << "|"
+        << iid << "|"
+        << isOpen << "|"
+        << isBuy << "|"
+        << total << "|"
+        << price << "|"
+        << isToday << "|"
+        << timeCondition << "|"
+        << volumeCondition;
+
+    // if (_isExistOrder(appKey, orderID)) {
+    //     _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "不要重复提交订单", orderID);
+    //     return;
+    // }
+    // if (type == ORDER_TYPE_NORMAL) { // 普通单有可能撤单，所以要判断撤单限制
+    //     int cancelTimes = _getCancelTimes();
+    //     if (cancelTimes >= _cancelTimesMax) {
+    //         Redis::getRds("t")->set("CAN_CANCEL", "0");
+    //         _rspMsg(appKey, CODE_ERR_ORDER_EXIST, "撤单已达上限，不能再下单", orderID);
+    //         return;
+    //     }
+    // }
+    // _initOrder(appKey, orderID, iid);
+
+    TThostFtdcOffsetFlagEnType closeFlag = isToday ? THOST_FTDC_OFEN_CloseToday : THOST_FTDC_OFEN_Close;
+    TThostFtdcOffsetFlagEnType flag = isOpen ? THOST_FTDC_OFEN_Open : closeFlag;
+    TThostFtdcContingentConditionType condition = THOST_FTDC_CC_Immediately;
+    // TThostFtdcTimeConditionType timeCondition = THOST_FTDC_TC_GFD;
+    // TThostFtdcVolumeConditionType volumeCondition = THOST_FTDC_VC_AV;
+    // TThostFtdcOrderPriceTypeType priceType = THOST_FTDC_OPT_LimitPrice;
+
+    // if (type == ORDER_TYPE_FOK) {
+    //     timeCondition = THOST_FTDC_TC_IOC;
+    //     volumeCondition = THOST_FTDC_VC_CV;
+    // }
+
+    // if (type == ORDER_TYPE_FAK) {
+    //     timeCondition = THOST_FTDC_TC_IOC;
+    //     volumeCondition = THOST_FTDC_VC_AV;
+    // }
+
+    // if (type == ORDER_TYPE_IOC) {
+    //     if (isBuy) {
+    //         string upper = Redis::getRds("tl")->get("UPPERLIMITPRICE_" + iid);
+    //         price = Lib::stod(upper);
+    //     } else {
+    //         string lower = Redis::getRds("tl")->get("LOWERLIMITPRICE_" + iid);
+    //         price = Lib::stod(lower);
+    //     }
+    // }
+
+
+    CThostFtdcInputOrderField order = _createOrder(iid, isBuy, total, price, flag,
+            THOST_FTDC_HFEN_Speculation, THOST_FTDC_OPT_LimitPrice, timeCondition, volumeCondition, condition);
+
+    int res = _tApi->ReqOrderInsert(&order, ++_maxOrderRef);
+    LOG(INFO) << "API_TRADE" << "|" << tdReqId << "|" << res;
+    if (res != 0) return res;
+
+}
 
 
 // void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
@@ -535,129 +523,129 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 //     Redis::getRds("t")->pub(_channelRsp + Lib::itos(appKey), jsonStr);
 // }
 
-// CThostFtdcInputOrderField TdSpi::_createOrder(string instrumnetID, bool isBuy, int total, double price,
-//     // double stopPrice,
-//     TThostFtdcOffsetFlagEnType offsetFlag, // 开平标志
-//     TThostFtdcHedgeFlagEnType hedgeFlag, // 投机套保标志
-//     TThostFtdcOrderPriceTypeType priceType, // 报单价格条件
-//     TThostFtdcTimeConditionType timeCondition, // 有效期类型
-//     TThostFtdcVolumeConditionType volumeCondition, //成交量类型
-//     TThostFtdcContingentConditionType contingentCondition// 触发条件
-//     )
-// {
-//     CThostFtdcInputOrderField order = {0};
+CThostFtdcInputOrderField TdSpi::_createOrder(string instrumnetId, bool isBuy, int total, double price,
+    // double stopPrice,
+    TThostFtdcOffsetFlagEnType offsetFlag, // 开平标志
+    TThostFtdcHedgeFlagEnType hedgeFlag, // 投机套保标志
+    TThostFtdcOrderPriceTypeType priceType, // 报单价格条件
+    TThostFtdcTimeConditionType timeCondition, // 有效期类型
+    TThostFtdcVolumeConditionType volumeCondition, //成交量类型
+    TThostFtdcContingentConditionType contingentCondition// 触发条件
+    )
+{
+    CThostFtdcInputOrderField order = {0};
 
-//     strcpy(order.BrokerID, _brokerID.c_str()); ///经纪公司代码
-//     strcpy(order.InvestorID, _userID.c_str()); ///投资者代码
-//     strcpy(order.InstrumentID, instrumnetID.c_str()); ///合约代码
-//     strcpy(order.UserID, _userID.c_str()); ///用户代码
-//     // strcpy(order.ExchangeID, "SHFE"); ///交易所代码
+    strcpy(order.BrokerID, _brokerId.c_str()); ///经纪公司代码
+    strcpy(order.InvestorID, _userId.c_str()); ///投资者代码
+    strcpy(order.InstrumentID, instrumnetId.c_str()); ///合约代码
+    strcpy(order.UserID, _userId.c_str()); ///用户代码
+    // strcpy(order.ExchangeID, "SHFE"); ///交易所代码
 
-//     order.MinVolume = 1;///最小成交量
-//     order.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;///强平原因
-//     order.IsAutoSuspend = 0;///自动挂起标志
-//     order.UserForceClose = 0;///用户强评标志
-//     order.IsSwapOrder = 0;///互换单标志
+    order.MinVolume = 1;///最小成交量
+    order.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;///强平原因
+    order.IsAutoSuspend = 0;///自动挂起标志
+    order.UserForceClose = 0;///用户强评标志
+    order.IsSwapOrder = 0;///互换单标志
 
-//     order.Direction = isBuy ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell; ///买卖方向
-//     order.VolumeTotalOriginal = total;///数量
-//     order.LimitPrice = price;///价格
-//     order.StopPrice = 0;///止损价
-//     if (contingentCondition != THOST_FTDC_CC_Immediately) {
-//         order.StopPrice = price;///止损价
-//     }
+    order.Direction = isBuy ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell; ///买卖方向
+    order.VolumeTotalOriginal = total;///数量
+    order.LimitPrice = price;///价格
+    order.StopPrice = 0;///止损价
+    if (contingentCondition != THOST_FTDC_CC_Immediately) {
+        order.StopPrice = price;///止损价
+    }
 
-//     ///组合开平标志
-//     //THOST_FTDC_OFEN_Open 开仓
-//     //THOST_FTDC_OFEN_Close 平仓
-//     //THOST_FTDC_OFEN_ForceClose 强平
-//     //THOST_FTDC_OFEN_CloseToday 平今
-//     //THOST_FTDC_OFEN_CloseYesterday 平昨
-//     //THOST_FTDC_OFEN_ForceOff 强减
-//     //THOST_FTDC_OFEN_LocalForceClose 本地强平
-//     order.CombOffsetFlag[0] = offsetFlag;
-//     if (THOST_FTDC_OFEN_ForceClose == offsetFlag) {
-//         order.ForceCloseReason = THOST_FTDC_FCC_Other; // 其他
-//         order.UserForceClose = 1;
-//     }
+    ///组合开平标志
+    //THOST_FTDC_OFEN_Open 开仓
+    //THOST_FTDC_OFEN_Close 平仓
+    //THOST_FTDC_OFEN_ForceClose 强平
+    //THOST_FTDC_OFEN_CloseToday 平今
+    //THOST_FTDC_OFEN_CloseYesterday 平昨
+    //THOST_FTDC_OFEN_ForceOff 强减
+    //THOST_FTDC_OFEN_LocalForceClose 本地强平
+    order.CombOffsetFlag[0] = offsetFlag;
+    if (THOST_FTDC_OFEN_ForceClose == offsetFlag) {
+        order.ForceCloseReason = THOST_FTDC_FCC_Other; // 其他
+        order.UserForceClose = 1;
+    }
 
-//     ///组合投机套保标志
-//     // THOST_FTDC_HFEN_Speculation 投机
-//     // THOST_FTDC_HFEN_Arbitrage 套利
-//     // THOST_FTDC_HFEN_Hedge 套保
-//     order.CombHedgeFlag[0] = hedgeFlag;
+    ///组合投机套保标志
+    // THOST_FTDC_HFEN_Speculation 投机
+    // THOST_FTDC_HFEN_Arbitrage 套利
+    // THOST_FTDC_HFEN_Hedge 套保
+    order.CombHedgeFlag[0] = hedgeFlag;
 
-//     ///报单价格条件
-//     // THOST_FTDC_OPT_AnyPrice 任意价
-//     // THOST_FTDC_OPT_LimitPrice 限价
-//     // THOST_FTDC_OPT_BestPrice 最优价
-//     // THOST_FTDC_OPT_LastPrice 最新价
-//     // THOST_FTDC_OPT_LastPricePlusOneTicks 最新价浮动上浮1个ticks
-//     // THOST_FTDC_OPT_LastPricePlusTwoTicks 最新价浮动上浮2个ticks
-//     // THOST_FTDC_OPT_LastPricePlusThreeTicks 最新价浮动上浮3个ticks
-//     // THOST_FTDC_OPT_AskPrice1 卖一价
-//     // THOST_FTDC_OPT_AskPrice1PlusOneTicks 卖一价浮动上浮1个ticks
-//     // THOST_FTDC_OPT_AskPrice1PlusTwoTicks 卖一价浮动上浮2个ticks
-//     // THOST_FTDC_OPT_AskPrice1PlusThreeTicks 卖一价浮动上浮3个ticks
-//     // THOST_FTDC_OPT_BidPrice1 买一价
-//     // THOST_FTDC_OPT_BidPrice1PlusOneTicks 买一价浮动上浮1个ticks
-//     // THOST_FTDC_OPT_BidPrice1PlusTwoTicks 买一价浮动上浮2个ticks
-//     // THOST_FTDC_OPT_BidPrice1PlusThreeTicks 买一价浮动上浮3个ticks
-//     // THOST_FTDC_OPT_FiveLevelPrice 五档价
-//     order.OrderPriceType = priceType;
+    ///报单价格条件
+    // THOST_FTDC_OPT_AnyPrice 任意价
+    // THOST_FTDC_OPT_LimitPrice 限价
+    // THOST_FTDC_OPT_BestPrice 最优价
+    // THOST_FTDC_OPT_LastPrice 最新价
+    // THOST_FTDC_OPT_LastPricePlusOneTicks 最新价浮动上浮1个ticks
+    // THOST_FTDC_OPT_LastPricePlusTwoTicks 最新价浮动上浮2个ticks
+    // THOST_FTDC_OPT_LastPricePlusThreeTicks 最新价浮动上浮3个ticks
+    // THOST_FTDC_OPT_AskPrice1 卖一价
+    // THOST_FTDC_OPT_AskPrice1PlusOneTicks 卖一价浮动上浮1个ticks
+    // THOST_FTDC_OPT_AskPrice1PlusTwoTicks 卖一价浮动上浮2个ticks
+    // THOST_FTDC_OPT_AskPrice1PlusThreeTicks 卖一价浮动上浮3个ticks
+    // THOST_FTDC_OPT_BidPrice1 买一价
+    // THOST_FTDC_OPT_BidPrice1PlusOneTicks 买一价浮动上浮1个ticks
+    // THOST_FTDC_OPT_BidPrice1PlusTwoTicks 买一价浮动上浮2个ticks
+    // THOST_FTDC_OPT_BidPrice1PlusThreeTicks 买一价浮动上浮3个ticks
+    // THOST_FTDC_OPT_FiveLevelPrice 五档价
+    order.OrderPriceType = priceType;
 
-//     ///有效期类型
-//     // THOST_FTDC_TC_IOC 立即完成，否则撤销
-//     // THOST_FTDC_TC_GFS 本节有效
-//     // THOST_FTDC_TC_GFD 当日有效
-//     // THOST_FTDC_TC_GTD 指定日期前有效
-//     // THOST_FTDC_TC_GTC 撤销前有效
-//     // THOST_FTDC_TC_GFA 集合竞价有效
-//     order.TimeCondition = timeCondition;
+    ///有效期类型
+    // THOST_FTDC_TC_IOC 立即完成，否则撤销
+    // THOST_FTDC_TC_GFS 本节有效
+    // THOST_FTDC_TC_GFD 当日有效
+    // THOST_FTDC_TC_GTD 指定日期前有效
+    // THOST_FTDC_TC_GTC 撤销前有效
+    // THOST_FTDC_TC_GFA 集合竞价有效
+    order.TimeCondition = timeCondition;
 
-//     ///成交量类型
-//     // THOST_FTDC_VC_AV 任何数量
-//     // THOST_FTDC_VC_MV 最小数量
-//     // THOST_FTDC_VC_CV 全部数量
-//     order.VolumeCondition = volumeCondition;
+    ///成交量类型
+    // THOST_FTDC_VC_AV 任何数量
+    // THOST_FTDC_VC_MV 最小数量
+    // THOST_FTDC_VC_CV 全部数量
+    order.VolumeCondition = volumeCondition;
 
-//     ///触发条件
-//     // THOST_FTDC_CC_Immediately 立即
-//     // THOST_FTDC_CC_Touch 止损
-//     // THOST_FTDC_CC_TouchProfit 止赢
-//     // THOST_FTDC_CC_ParkedOrder 预埋单
-//     // THOST_FTDC_CC_LastPriceGreaterThanStopPrice 最新价大于条件价
-//     // THOST_FTDC_CC_LastPriceGreaterEqualStopPrice 最新价大于等于条件价
-//     // THOST_FTDC_CC_LastPriceLesserThanStopPrice 最新价小于条件价
-//     // THOST_FTDC_CC_LastPriceLesserEqualStopPrice 最新价小于等于条件价
-//     // THOST_FTDC_CC_AskPriceGreaterThanStopPrice 卖一价大于条件价
-//     // THOST_FTDC_CC_AskPriceGreaterEqualStopPrice 卖一价大于等于条件价
-//     // THOST_FTDC_CC_AskPriceLesserThanStopPrice 卖一价小于条件价
-//     // THOST_FTDC_CC_AskPriceLesserEqualStopPrice 卖一价小于等于条件价
-//     // THOST_FTDC_CC_BidPriceGreaterThanStopPrice 买一价大于条件价
-//     // THOST_FTDC_CC_BidPriceGreaterEqualStopPrice 买一价大于等于条件价
-//     // THOST_FTDC_CC_BidPriceLesserThanStopPrice 买一价小于条件价
-//     // THOST_FTDC_CC_BidPriceLesserEqualStopPrice 买一价小于等于条件价
-//     order.ContingentCondition = contingentCondition;
+    ///触发条件
+    // THOST_FTDC_CC_Immediately 立即
+    // THOST_FTDC_CC_Touch 止损
+    // THOST_FTDC_CC_TouchProfit 止赢
+    // THOST_FTDC_CC_ParkedOrder 预埋单
+    // THOST_FTDC_CC_LastPriceGreaterThanStopPrice 最新价大于条件价
+    // THOST_FTDC_CC_LastPriceGreaterEqualStopPrice 最新价大于等于条件价
+    // THOST_FTDC_CC_LastPriceLesserThanStopPrice 最新价小于条件价
+    // THOST_FTDC_CC_LastPriceLesserEqualStopPrice 最新价小于等于条件价
+    // THOST_FTDC_CC_AskPriceGreaterThanStopPrice 卖一价大于条件价
+    // THOST_FTDC_CC_AskPriceGreaterEqualStopPrice 卖一价大于等于条件价
+    // THOST_FTDC_CC_AskPriceLesserThanStopPrice 卖一价小于条件价
+    // THOST_FTDC_CC_AskPriceLesserEqualStopPrice 卖一价小于等于条件价
+    // THOST_FTDC_CC_BidPriceGreaterThanStopPrice 买一价大于条件价
+    // THOST_FTDC_CC_BidPriceGreaterEqualStopPrice 买一价大于等于条件价
+    // THOST_FTDC_CC_BidPriceLesserThanStopPrice 买一价小于条件价
+    // THOST_FTDC_CC_BidPriceLesserEqualStopPrice 买一价小于等于条件价
+    order.ContingentCondition = contingentCondition;
 
-//     ///报单引用
-//     sprintf(order.OrderRef, "%d", _maxOrderRef);
+    ///报单引用
+    sprintf(order.OrderRef, "%d", _maxOrderRef);
 
-//     ///请求编号
-//     // _reqId++;
-//     order.RequestID = _maxOrderRef;
+    ///请求编号
+    // _reqId++;
+    order.RequestID = _maxOrderRef;
 
-//     // order.GTDDate = ;///GTD日期
-//     // order.BusinessUnit = ;///业务单元
-//     // order.InvestUnitID = ;///投资单元代码
-//     // order.AccountID = ;///资金账号
-//     // order.CurrencyID = ;///币种代码
-//     // order.ClientID = ;///交易编码
-//     // order.IPAddress = ;///IP地址
-//     // order.MacAddress = ;///Mac地址
+    // order.GTDDate = ;///GTD日期
+    // order.BusinessUnit = ;///业务单元
+    // order.InvestUnitID = ;///投资单元代码
+    // order.AccountID = ;///资金账号
+    // order.CurrencyID = ;///币种代码
+    // order.ClientID = ;///交易编码
+    // order.IPAddress = ;///IP地址
+    // order.MacAddress = ;///Mac地址
 
-//     return order;
-// }
+    return order;
+}
 
 // TdSpi::~TdSpi()
 // {

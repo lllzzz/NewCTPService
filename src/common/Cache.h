@@ -38,6 +38,7 @@ public:
     void set(string, string);
     void incr(string);
     string get(string);
+    void push(Json::Value);
 
 };
 

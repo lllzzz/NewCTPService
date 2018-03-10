@@ -11,10 +11,7 @@
 #define CODE_ERR_ORDER_EXIST 1001
 #define CODE_ERR_ORDER_NOT_EXIST 1002
 
-#define ORDER_TYPE_NORMAL 0
-#define ORDER_TYPE_FAK 1
-#define ORDER_TYPE_IOC 2
-#define ORDER_TYPE_FOK 3
+#define SAVE_KEY_TRADE "TRADE";
 
 
 class TdSpi : public CThostFtdcTraderSpi
@@ -41,19 +38,23 @@ private:
     // 清理MessageProcesser对象
     void _clearProcesser(int);
 
+    // // 查询订单存在
+    // std::vector<int> _reqIdVec;
+    // bool _checkReqExist(int);
+
     // string _confirmDate;
     // int _cancelTimesMax;
 
 
-    // // 构造订单
-    // CThostFtdcInputOrderField _createOrder(string, bool, int, double,
-    //     TThostFtdcOffsetFlagEnType, // 开平标志
-    //     TThostFtdcHedgeFlagEnType = THOST_FTDC_HFEN_Speculation, // 投机套保标志
-    //     TThostFtdcOrderPriceTypeType = THOST_FTDC_OPT_LimitPrice, // 报单价格条件
-    //     TThostFtdcTimeConditionType = THOST_FTDC_TC_IOC, // 有效期类型
-    //     TThostFtdcVolumeConditionType = THOST_FTDC_VC_CV, //成交量类型
-    //     TThostFtdcContingentConditionType = THOST_FTDC_CC_Immediately// 触发条件
-    // );
+    // 构造订单
+    CThostFtdcInputOrderField _createOrder(string, bool, int, double,
+        TThostFtdcOffsetFlagEnType, // 开平标志
+        TThostFtdcHedgeFlagEnType = THOST_FTDC_HFEN_Speculation, // 投机套保标志
+        TThostFtdcOrderPriceTypeType = THOST_FTDC_OPT_LimitPrice, // 报单价格条件
+        TThostFtdcTimeConditionType = THOST_FTDC_TC_IOC, // 有效期类型
+        TThostFtdcVolumeConditionType = THOST_FTDC_VC_CV, //成交量类型
+        TThostFtdcContingentConditionType = THOST_FTDC_CC_Immediately// 触发条件
+    );
 
     // // 处理订单反馈
     // void _onOrder(CThostFtdcOrderField *);
@@ -87,7 +88,10 @@ public:
     void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     // // 下单/撤单
-    // void trade(int, int, string, bool, bool, int, double, int, bool = true); // ReqOrderInsert
+    int trade(int tdReqId, string iid, 
+        bool isOpen, bool isBuy, int total, double price, bool isToday, 
+        TThostFtdcTimeConditionType timeCondition,
+        TThostFtdcVolumeConditionType volumeCondition); // ReqOrderInsert
     // void cancel(int, int); // ReqOrderAction
     // void OnRtnOrder(CThostFtdcOrderField *pOrder);
     // void OnRtnTrade(CThostFtdcTradeField *pTrade);

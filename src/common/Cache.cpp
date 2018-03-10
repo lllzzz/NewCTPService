@@ -76,3 +76,11 @@ void Cache::incr(string key)
     }
     freeReplyObject(redisRet);
 }
+
+void Cache::push(Json::Value data)
+{
+    Json::FastWriter writer;
+    string dataStr = writer.write(data);
+    redisRet = (redisReply*)redisCommand(redisHandler, "LPUSH %s %s", Config::get("queueKey").c_str(), dataStr.c_str());
+    freeReplyObject(redisRet);
+}

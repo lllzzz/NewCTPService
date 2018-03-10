@@ -9,6 +9,9 @@
 #include <vector>
 #include <jsoncpp/json/json.h>
 #include <glog/logging.h>
+#include "../ctp/ThostFtdcTraderApi.h"
+#include "../common/Cache.h"
+#include "../message/MessageTunnel.h"
 
 using namespace std;
 
