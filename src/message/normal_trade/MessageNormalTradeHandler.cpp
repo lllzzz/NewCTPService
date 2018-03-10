@@ -8,14 +8,12 @@ bool MessageNormalTradeHandler::process(string data)
     Json::Reader reader;
     Json::Value jsonData;
 
-    string id = "";
-    if(reader.parse(data, jsonData)) {
-        id = jsonData["id"].asString();
-    } else {
+    if(!reader.parse(data, jsonData)) {
         LOG(INFO) << "JSON PARSE FAILED";
         exit(1);
     }
-    MessageNormalTradeProcesser* processer = new MessageNormalTradeProcesser(id);
+    MessageNormalTradeProcesser* processer = new MessageNormalTradeProcesser(jsonData["id"].asString(),
+        jsonData["from"].asString(), jsonData["iid"].asString());
 
     TdSpi* tdSpi = TdSpi::getInstance();
     tdSpi->addProcesser(processer);

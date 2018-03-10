@@ -31,8 +31,9 @@ private:
     string _brokerId;
     string _userId;
 
-    int _frontID;
-    int _sessionID;
+    int _frontId;
+    int _sessionId;
+
     int _maxOrderRef;
 
     // 清理MessageProcesser对象
@@ -47,7 +48,7 @@ private:
 
 
     // 构造订单
-    CThostFtdcInputOrderField _createOrder(string, bool, int, double,
+    CThostFtdcInputOrderField _createOrder(int, string, bool, int, double,
         TThostFtdcOffsetFlagEnType, // 开平标志
         TThostFtdcHedgeFlagEnType = THOST_FTDC_HFEN_Speculation, // 投机套保标志
         TThostFtdcOrderPriceTypeType = THOST_FTDC_OPT_LimitPrice, // 报单价格条件
@@ -93,8 +94,8 @@ public:
         TThostFtdcTimeConditionType timeCondition,
         TThostFtdcVolumeConditionType volumeCondition); // ReqOrderInsert
     // void cancel(int, int); // ReqOrderAction
-    // void OnRtnOrder(CThostFtdcOrderField *pOrder);
-    // void OnRtnTrade(CThostFtdcTradeField *pTrade);
+    void OnRtnOrder(CThostFtdcOrderField *pOrder);
+    void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
     // // 手续费查询
     // void qryCommissionRate(int, string); // ReqQryInstrumentCommissionRate?ReqQryOptionInstrCommRate?

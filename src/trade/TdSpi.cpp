@@ -11,7 +11,7 @@ TdSpi* TdSpi::getInstance()
 
 void TdSpi::addProcesser(MessageProcesser* processer)
 {
-    processer->tdReqId = _reqId++;
+    processer->tdReqId = _maxOrderRef++;
     _processerMap[processer->tdReqId] = processer;
 }
 
@@ -73,13 +73,13 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
         exit(1);
     }
 
-    _frontID     = pRspUserLogin->FrontID;
-    _sessionID   = pRspUserLogin->SessionID;
+    _frontId     = pRspUserLogin->FrontID;
+    _sessionId   = pRspUserLogin->SessionID;
     _maxOrderRef = atoi(pRspUserLogin->MaxOrderRef);
 
     LOG(INFO) << "User Info" << "|"
-        << _frontID << "|"
-        << _sessionID << "|"
+        << _frontId << "|"
+        << _sessionId << "|"
         << _maxOrderRef;
 
     // 确认
@@ -184,45 +184,62 @@ int TdSpi::trade(int tdReqId, string iid,
     // }
 
 
-    CThostFtdcInputOrderField order = _createOrder(iid, isBuy, total, price, flag,
+    CThostFtdcInputOrderField order = _createOrder(tdReqId, iid, isBuy, total, price, flag,
             THOST_FTDC_HFEN_Speculation, THOST_FTDC_OPT_LimitPrice, timeCondition, volumeCondition, condition);
 
-    int res = _tApi->ReqOrderInsert(&order, ++_maxOrderRef);
+    int res = _tApi->ReqOrderInsert(&order, tdReqId);
     LOG(INFO) << "API_TRADE" << "|" << tdReqId << "|" << res;
     if (res != 0) return res;
 
 }
 
 
-// void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
-// {
-//     if (!pOrder) return;
-//     if (pOrder->FrontID != _frontID || pOrder->SessionID != _sessionID) return;
-//     int orderRef = Lib::stoi(string(pOrder->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     if (!info.orderID) return;
+void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
+{
+    LOG(INFO) << "ON ORDER";
+    if (!pOrder) {
+        LOG(INFO) << "ORDER EMPTY";
+        exit(1);
+    }
+    if (pOrder->FrontID != _frontId || pOrder->SessionID != _sessionId) return;
 
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pOrder->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pOrder->OrderRef));
-//     _logger->push("orderStatus", Lib::ctos(pOrder->OrderStatus));
-//     _logger->push("VolumeTotalOriginal", Lib::itos(pOrder->VolumeTotalOriginal));
-//     _logger->push("VolumeTraded", Lib::itos(pOrder->VolumeTraded));
-//     _logger->push("VolumeTotal", Lib::itos(pOrder->VolumeTotal));
-//     _logger->push("ZCETotalTradedVolume", Lib::itos(pOrder->ZCETotalTradedVolume));
-//     _logger->push("OrderSysID", string(pOrder->OrderSysID));
-//     _logger->info("TdSpi[OnRtnOrder]");
+    LOG(INFO) << "ORDER INFO" << "|"
+        << pOrder->OrderRef << "|"
+        << pOrder->InstrumentID << "|"
+        << pOrder->OrderStatus << "|"
+        << pOrder->VolumeTotalOriginal << "|"
+        << pOrder->VolumeTraded << "|"
+        << pOrder->VolumeTotal << "|"
+        << pOrder->ZCETotalTradedVolume << "|"
+        << pOrder->OrderSysID;
 
-//     _updateOrder(orderRef, pOrder);
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
+    processer->setOrderInfo(pOrder);
+    if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled) {
+        processer->response((Json::Value*)NULL);
+    }
 
-//     if (pOrder->OrderStatus != THOST_FTDC_OST_Canceled) {
-//         _onOrder(pOrder);
-//     } else {
-//         _onCancel(pOrder);
-//     }
-// }
+    // // log
+    // _logger->push("appKey", Lib::itos(info.appKey));
+    // _logger->push("iid", string(pOrder->InstrumentID));
+    // _logger->push("orderID", Lib::itos(info.orderID));
+    // _logger->push("orderRef", string(pOrder->OrderRef));
+    // _logger->push("orderStatus", Lib::ctos(pOrder->OrderStatus));
+    // _logger->push("VolumeTotalOriginal", Lib::itos(pOrder->VolumeTotalOriginal));
+    // _logger->push("VolumeTraded", Lib::itos(pOrder->VolumeTraded));
+    // _logger->push("VolumeTotal", Lib::itos(pOrder->VolumeTotal));
+    // _logger->push("ZCETotalTradedVolume", Lib::itos(pOrder->ZCETotalTradedVolume));
+    // _logger->push("OrderSysID", string(pOrder->OrderSysID));
+    // _logger->info("TdSpi[OnRtnOrder]");
+
+    // _updateOrder(orderRef, pOrder);
+
+    // if (pOrder->OrderStatus != THOST_FTDC_OST_Canceled) {
+    //     _onOrder(pOrder);
+    // } else {
+    //     _onCancel(pOrder);
+    // }
+}
 
 
 // void TdSpi::_onOrder(CThostFtdcOrderField *pOrder)
@@ -238,8 +255,8 @@ int TdSpi::trade(int tdReqId, string iid,
 //     data["appKey"] = info.appKey;
 //     data["iid"] = pOrder->InstrumentID;
 //     data["orderID"] = info.orderID;
-//     data["frontID"] = _frontID;
-//     data["sessionID"] = _sessionID;
+//     data["frontID"] = _frontId;
+//     data["sessionID"] = _sessionId;
 //     data["orderRef"] = orderRef;
 //     data["insertDate"] = pOrder->InsertDate;
 //     data["insertTime"] = pOrder->InsertTime;
@@ -253,56 +270,65 @@ int TdSpi::trade(int tdReqId, string iid,
 // }
 
 
-// void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
-// {
-//     if (!pTrade) return;
-//     int orderRef = Lib::stoi(string(pTrade->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     if (!info.orderID) return;
+void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
+{
+    LOG(INFO) << "ON TRADE";
+    if (!pTrade) {
+        LOG(INFO) << "TRADE EMPTY";
+        exit(1);
+    }
 
-//     if (strcmp(info.eID, pTrade->ExchangeID) != 0 ||
-//         strcmp(info.oID, pTrade->OrderSysID) != 0)
-//     { // 不是我的订单
-//         return;
-//     }
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pTrade->OrderRef))];
+    if (!processer->checkOrder(pTrade)) {
+        return;
+    }
+    // if (strcmp(info.eID, pTrade->ExchangeID) != 0 ||
+    //     strcmp(info.oID, pTrade->OrderSysID) != 0)
+    // { // 不是我的订单
+    //     return;
+    // }
+    LOG(INFO) << "TRADE INFO" << "|"
+        << pTrade->OrderRef << "|"
+        << pTrade->InstrumentID << "|"
+        << pTrade->Price << "|"
+        << pTrade->TradeID << "|"
+        << pTrade->TradeDate << "|"
+        << pTrade->TradeTime << "|"
+        << pTrade->ExchangeID << "|"
+        << pTrade->Volume;
 
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pTrade->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pTrade->OrderRef));
-//     _logger->push("price", Lib::dtos(pTrade->Price));
-//     _logger->push("TradeID", string(pTrade->TradeID));
-//     _logger->push("tradeDate", string(pTrade->TradeDate));
-//     _logger->push("tradeTime", string(pTrade->TradeTime));
-//     _logger->push("ExchangeID", string(pTrade->ExchangeID));
-//     _logger->push("Volume", Lib::itos(pTrade->Volume));
-//     _logger->info("TdSpi[OnRtnTrade]");
+    Json::Value data;
+    data["dealPrice"] = pTrade->Price;
+    data["dealVolumn"] = pTrade->Volume;
+    data["tdReqId"] = pTrade->OrderRef;
+    data["tradeId"] = pTrade->TradeID;
+    data["tradeDate"] = pTrade->TradeDate;
+    data["tradeTime"] = pTrade->TradeTime;
+    // data["exchangeID"] = pTrade->ExchangeID;
+    processer->response(data);
 
-//     Json::Value data;
+    // data["type"] = "traded";
+    // data["iid"] = pTrade->InstrumentID;
+    // data["orderID"] = info.orderID;
+    // data["realPrice"] = pTrade->Price;
+    // data["successVol"] = pTrade->Volume;
+    // _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
 
-//     data["type"] = "traded";
-//     data["iid"] = pTrade->InstrumentID;
-//     data["orderID"] = info.orderID;
-//     data["realPrice"] = pTrade->Price;
-//     data["successVol"] = pTrade->Volume;
-//     _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
+    // string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
+    // data["appKey"] = info.appKey;
+    // data["orderRef"] = pTrade->OrderRef;
+    // data["frontID"] = _frontId;
+    // data["sessionID"] = _sessionId;
+    // data["tradeDate"] = pTrade->TradeDate;
+    // data["tradeTime"] = pTrade->TradeTime;
+    // data["localTime"] = time;
+    // data["successVol"] = pTrade->Volume;
+    // data["tradeID"] = pTrade->TradeID;
 
-//     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
-//     data["appKey"] = info.appKey;
-//     data["orderRef"] = pTrade->OrderRef;
-//     data["frontID"] = _frontID;
-//     data["sessionID"] = _sessionID;
-//     data["tradeDate"] = pTrade->TradeDate;
-//     data["tradeTime"] = pTrade->TradeTime;
-//     data["localTime"] = time;
-//     data["successVol"] = pTrade->Volume;
-//     data["tradeID"] = pTrade->TradeID;
-
-//     Json::FastWriter writer;
-//     std::string qStr = writer.write(data);
-//     Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
-// }
+    // Json::FastWriter writer;
+    // std::string qStr = writer.write(data);
+    // Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
+}
 
 
 // void TdSpi::cancel(int appKey, int orderID)
@@ -327,9 +353,9 @@ int TdSpi::trade(int tdReqId, string iid,
 //     ///报单引用
 //     strncpy(req.OrderRef, info.oRef, sizeof(TThostFtdcOrderRefType));
 //     ///前置编号
-//     req.FrontID = _frontID;
+//     req.FrontID = _frontId;
 //     ///会话编号
-//     req.SessionID = _sessionID;
+//     req.SessionID = _sessionId;
 //     ///合约代码
 //     strncpy(req.InstrumentID, Lib::stoc(info.iid), sizeof(TThostFtdcInstrumentIDType));
 //     ///操作标志
@@ -374,8 +400,8 @@ int TdSpi::trade(int tdReqId, string iid,
 //     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
 //     data["appKey"] = info.appKey;
 //     data["orderRef"] = pOrder->OrderRef;
-//     data["frontID"] = _frontID;
-//     data["sessionID"] = _sessionID;
+//     data["frontID"] = _frontId;
+//     data["sessionID"] = _sessionId;
 //     data["insertDate"] = pOrder->InsertDate;
 //     data["insertTime"] = pOrder->InsertTime;
 //     data["localTime"] = time;
@@ -435,7 +461,7 @@ int TdSpi::trade(int tdReqId, string iid,
 //     int orderRef = Lib::stoi(string(pInputOrderAction->OrderRef));
 //     OrderInfo info = _getOrderByRef(orderRef);
 //     if (!info.orderID) return;
-//     if (pInputOrderAction->SessionID != _sessionID || pInputOrderAction->FrontID != _frontID) return;
+//     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
 
 //     // log
 //     _logger->push("appKey", Lib::itos(info.appKey));
@@ -523,7 +549,7 @@ int TdSpi::trade(int tdReqId, string iid,
 //     Redis::getRds("t")->pub(_channelRsp + Lib::itos(appKey), jsonStr);
 // }
 
-CThostFtdcInputOrderField TdSpi::_createOrder(string instrumnetId, bool isBuy, int total, double price,
+CThostFtdcInputOrderField TdSpi::_createOrder(int tdReqId, string instrumnetId, bool isBuy, int total, double price,
     // double stopPrice,
     TThostFtdcOffsetFlagEnType offsetFlag, // 开平标志
     TThostFtdcHedgeFlagEnType hedgeFlag, // 投机套保标志
@@ -629,11 +655,11 @@ CThostFtdcInputOrderField TdSpi::_createOrder(string instrumnetId, bool isBuy, i
     order.ContingentCondition = contingentCondition;
 
     ///报单引用
-    sprintf(order.OrderRef, "%d", _maxOrderRef);
+    sprintf(order.OrderRef, "%d", tdReqId);
 
     ///请求编号
     // _reqId++;
-    order.RequestID = _maxOrderRef;
+    order.RequestID = tdReqId;
 
     // order.GTDDate = ;///GTD日期
     // order.BusinessUnit = ;///业务单元

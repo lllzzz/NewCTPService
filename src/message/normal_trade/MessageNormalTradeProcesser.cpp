@@ -19,7 +19,7 @@ bool MessageNormalTradeProcesser::process(Json::Value data)
     if (!code) {
         Json::Value req;
         req["code"] = code;
-        MessageService::getInstance()->fire(REQUEST_NORMAL_TRADE, req);
+        MessageService::getInstance()->fire(RESPONSE_NORMAL_TRADE, req);
         return false;
     }
 
@@ -29,7 +29,35 @@ bool MessageNormalTradeProcesser::process(Json::Value data)
     return true;
 }
 
-void MessageNormalTradeProcesser::request(Json::Value data)
+void MessageNormalTradeProcesser::response(Json::Value data)
 {
-    LOG(INFO) << "REQUEST" << "|" << _id;
+    LOG(INFO) << "RESPONSE START" << "|" << _id;
+    data["iid"] = _iid;
+    data["from"] = _from;
+    data["id"] = _id;
+    Json::Value req;
+    req["code"] = 0;
+    req["data"] = data;
+    MessageService::getInstance()->fire(RESPONSE_NORMAL_TRADE, req);
+    Cache::getInstance()->push(data);
 }
+
+
+void MessageNormalTradeProcesser::setOrderInfo(CThostFtdcOrderField *pOrder)
+{
+    _exchangeId = string(pOrder->ExchangeID);
+    _orderSysId = string(pOrder->OrderSysID);
+}
+
+
+bool MessageNormalTradeProcesser::checkOrder(CThostFtdcTradeField *pTrade)
+{
+    string exchangeId = string(pTrade->ExchangeID);
+    string orderSysId = string(pTrade->OrderSysID);
+    if (_exchangeId.compare(exchangeId) || _orderSysId.compare(orderSysId)) {
+        return false;
+    }
+    return true;
+}
+
+
