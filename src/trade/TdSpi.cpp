@@ -404,84 +404,112 @@ int TdSpi::cancel(std::string id)
 // }
 
 
-// void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-//     if (pRspInfo && pRspInfo->ErrorID != 0) {
-//         _logger->error("TdSpi[OnRspOrderInsert]", pRspInfo, nRequestID, bIsLast);
-//     }
-//     int orderRef = Lib::stoi(string(pInputOrder->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     if (!info.orderID) return;
+void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    LOG(INFO) << "ON ORDER INSERT";
 
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pInputOrder->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pInputOrder->OrderRef));
-//     _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
-//     _logger->info("TdSpi[OnRspOrderInsert]");
-// }
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        LOG(INFO) << "ERROR" << "|"
+            << pRspInfo->ErrorID << "|"
+            << pRspInfo->ErrorMsg << "|"
+            << nRequestID << "|"
+            << bIsLast;
+        exit(1);
+    }
 
-// void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo)
-// {
-//     if (pRspInfo && pRspInfo->ErrorID != 0) {
-//         _logger->error("TdSpi[OnErrRtnOrderInsert]", pRspInfo, 0, 1);
-//     }
-//     int orderRef = Lib::stoi(string(pInputOrder->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     if (!info.orderID) return;
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];    
+    LOG(INFO) << "ORDER INSERT INFO" << "|"
+        << processer->getId() << "|"
+        << pInputOrder->OrderRef << "|"
+        << pInputOrder->InstrumentID << "|"
+        << pRspInfo->ErrorID;
 
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pInputOrder->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pInputOrder->OrderRef));
-//     _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
-//     _logger->info("TdSpi[OnErrRtnOrderInsert]");
+}
 
-//     _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
-// }
+void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo)
+{
+    LOG(INFO) << "ON ORDER ERROR";
 
-// void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-//     if (pRspInfo && pRspInfo->ErrorID != 0) {
-//         _logger->error("TdSpi[OnRspOrderAction]", pRspInfo, nRequestID, bIsLast);
-//     }
-//     int orderRef = Lib::stoi(string(pInputOrderAction->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     if (!info.orderID) return;
-//     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        LOG(INFO) << "ERROR" << "|"
+            << pRspInfo->ErrorID << "|"
+            << pRspInfo->ErrorMsg;
+        exit(1);
+    }
 
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pInputOrderAction->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pInputOrderAction->OrderRef));
-//     _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
-//     _logger->info("TdSpi[OnRspOrderAction]");
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))]; 
+    LOG(INFO) << "ORDER ERROR INFO" << "|"
+        << processer->getId() << "|"
+        << pInputOrder->OrderRef << "|"
+        << pInputOrder->InstrumentID << "|"
+        << pRspInfo->ErrorID;
 
-//     _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
+    // _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
+}
 
-// }
+void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    LOG(INFO) << "ON ORDER ACTION";
 
-// void TdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-//     if (pRspInfo && pRspInfo->ErrorID != 0) {
-//         _logger->error("TdSpi[OnRspError]", pRspInfo, nRequestID, bIsLast);
-//     }
-// }
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        LOG(INFO) << "ERROR" << "|"
+            << pRspInfo->ErrorID << "|"
+            << pRspInfo->ErrorMsg << "|"
+            << nRequestID << "|"
+            << bIsLast;
+        exit(1);
+    }
+    if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
 
-// void TdSpi::OnFrontDisconnected(int nReason)
-// {
-//     _logger->push("nReason", Lib::itos(nReason));
-//     _logger->info("TdSpi[OnFrontDisconnected]");
-// }
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))]; 
+    LOG(INFO) << "ORDER ERROR INFO" << "|"
+        << processer->getId() << "|"
+        << pInputOrderAction->OrderRef << "|"
+        << pInputOrderAction->InstrumentID << "|"
+        << pRspInfo->ErrorID;
 
-// void TdSpi::OnHeartBeatWarning(int nTimeLapse)
-// {
-//     _logger->push("nTimeLapse", Lib::itos(nTimeLapse));
-//     _logger->info("TdSpi[OnHeartBeatWarning]");
-// }
+    // if (pRspInfo && pRspInfo->ErrorID != 0) {
+    //     _logger->error("TdSpi[OnRspOrderAction]", pRspInfo, nRequestID, bIsLast);
+    // }
+    // int orderRef = Lib::stoi(string(pInputOrderAction->OrderRef));
+    // OrderInfo info = _getOrderByRef(orderRef);
+    // if (!info.orderID) return;
+
+    // // log
+    // _logger->push("appKey", Lib::itos(info.appKey));
+    // _logger->push("iid", string(pInputOrderAction->InstrumentID));
+    // _logger->push("orderID", Lib::itos(info.orderID));
+    // _logger->push("orderRef", string(pInputOrderAction->OrderRef));
+    // _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
+    // _logger->info("TdSpi[OnRspOrderAction]");
+
+    // _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
+
+}
+
+void TdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    LOG(INFO) << "ON ERROR";
+
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        LOG(INFO) << "ERROR" << "|"
+            << pRspInfo->ErrorID << "|"
+            << pRspInfo->ErrorMsg << "|"
+            << nRequestID << "|"
+            << bIsLast;
+        exit(1);
+    }
+}
+
+void TdSpi::OnFrontDisconnected(int nReason)
+{
+    LOG(INFO) << "ON FRONT DESCONNECTED" << "|" << nReason;
+}
+
+void TdSpi::OnHeartBeatWarning(int nTimeLapse)
+{
+    LOG(INFO) << "ON HEARBEAT WARNING" << "|" << nTimeLapse;
+}
 
 // void TdSpi::_initOrder(int appKey, int orderID, string iid)
 // {
@@ -662,13 +690,13 @@ CThostFtdcInputOrderField TdSpi::_createOrder(int tdReqId, string instrumnetId, 
     return order;
 }
 
-// TdSpi::~TdSpi()
-// {
-//     _tApi->RegisterSpi(NULL);
-//     _tApi->Release();
-//     _tApi = NULL;
-//     _logger->info("TdSpi[~]");
-// }
+TdSpi::~TdSpi()
+{
+    _tApi->RegisterSpi(NULL);
+    _tApi->Release();
+    _tApi = NULL;
+    LOG(INFO) << "BYE";
+}
 
 
 
