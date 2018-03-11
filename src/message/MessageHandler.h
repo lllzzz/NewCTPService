@@ -50,4 +50,18 @@ public:
     bool process(string);
 };
 
+class MessageFAKHandler: public MessageHandler
+{
+public:
+    MessageFAKHandler(string name):MessageHandler(name) {};
+    bool process(string);
+};
+
+class MessageFOKHandler: public MessageHandler
+{
+public:
+    MessageFOKHandler(string name):MessageHandler(name) {};
+    bool process(string);
+};
+
 #endif

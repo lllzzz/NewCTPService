@@ -21,6 +21,7 @@ int main(int argc, char const *argv[])
     MessageService* msgSrv = MessageService::getInstance();
     msgSrv->addHandler(new MessageNormalTradeHandler(NORMAL_TRADE)); // 下单
     msgSrv->addHandler(new MessageCancelHandler(CANCEL)); // 撤单
+    msgSrv->addHandler(new MessageFAKHandler(FAK)); // 撤单
     TdSpi::getInstance();
     cout << "Trade服务启动..." << endl;
     msgSrv->run();

@@ -1,6 +1,14 @@
 #include "../MessageProcesser.h"
 #include "../../trade/TdSpi.h"
 
+/**
+ * {
+ *     "id": "12311223123",
+ *     "from": "test",
+ *     "iid": "xxx",
+ *     "tradeId": "12333123123",
+ * }
+ */
 bool MessageCancelProcesser::process(Json::Value data)
 {
     LOG(INFO) << "PROCESS START" << "|" << _id;
@@ -11,7 +19,7 @@ bool MessageCancelProcesser::process(Json::Value data)
     if (!code) {
         Json::Value req;
         req["code"] = code;
-        MessageService::getInstance()->fire(RESPONSE_CANCEL, req);
+        MessageService::getInstance()->fire(RESPONSE_CANCEL + _from, req);
         return false;
     }
 
@@ -22,6 +30,16 @@ bool MessageCancelProcesser::process(Json::Value data)
     return true;
 }
 
+/**
+ * {
+ *     "code": 0,
+ *     "data": {
+ *         "id": "12311223123",
+ *         "from": "test",
+ *         "iid": "xxx",
+ *     }
+ * }
+ */
 void MessageCancelProcesser::response(Json::Value data)
 {
     LOG(INFO) << "RESPONSE START" << "|" << _id;
@@ -31,7 +49,7 @@ void MessageCancelProcesser::response(Json::Value data)
     Json::Value req;
     req["code"] = 0;
     req["data"] = data;
-    MessageService::getInstance()->fire(RESPONSE_CANCEL, req);
+    MessageService::getInstance()->fire(RESPONSE_CANCEL + _from, req);
     data["action"] = "CANCELED";
     Cache::getInstance()->push(data);
 }

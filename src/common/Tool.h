@@ -12,6 +12,7 @@ class Tool
 public:
 
     static int s2i(string);
+    static double s2d(string);
     static string d2s(double);
     static string i2s(int);
     static string getDateTime(string);

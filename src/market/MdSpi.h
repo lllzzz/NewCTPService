@@ -8,6 +8,7 @@
 #include "../message/MessageTunnel.h"
 #include "../common/Config.h"
 #include "../common/Cache.h"
+#include "ShareData.h"
 
 using namespace std;
 

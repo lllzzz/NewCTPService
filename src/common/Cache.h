@@ -14,10 +14,6 @@
 
 using namespace std;
 
-const string CACHE_KEY_IID_UPPER_PRICE = "CACHE_KEY_IID_UPPER_PRICE_"; // key_iid 合约最高价
-const string CACHE_KEY_IID_LOWER_PRICE = "CACHE_KEY_IID_LOWER_PRICE_"; // key_iid 合约最低价
-const string CACHE_KEY_IID_LAST_PRICE = "CACHE_KEY_IID_LAST_PRICE_"; // key_iid 最新价
-
 class Cache
 {
 private:

@@ -1,6 +1,7 @@
-common = Config.o Tool.o Cache.o MessageService.o
+common = Config.o Tool.o Cache.o MessageService.o ShareData.o
 trade = MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
-		MessageCancelProcesser.o MessageCancelHandler.o
+		MessageCancelProcesser.o MessageCancelHandler.o \
+		MessageFAKProcesser.o MessageFAKHandler.o 
 
 
 market.o: src/market/main.cpp
@@ -26,6 +27,9 @@ Cache.o: src/common/Cache.h src/common/Cache.cpp
 Tool.o: src/common/Tool.h src/common/Tool.cpp
 	g++ -c src/common/Tool.cpp
 
+ShareData.o: src/market/ShareData.h src/market/ShareData.cpp
+	g++ -c src/market/ShareData.cpp
+
 
 
 MessageService.o: src/message/MessageService.h src/message/MessageService.cpp
@@ -42,6 +46,12 @@ MessageCancelHandler.o: src/message/MessageHandler.h src/message/cancel/MessageC
 
 MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
 	g++ -c src/message/cancel/MessageCancelProcesser.cpp
+
+MessageFAKHandler.o: src/message/MessageHandler.h src/message/fak/MessageFAKHandler.cpp
+	g++ -c src/message/fak/MessageFAKHandler.cpp
+
+MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
+	g++ -c src/message/fak/MessageFAKProcesser.cpp
 
 
 market: market.o MdSpi.o $(common)

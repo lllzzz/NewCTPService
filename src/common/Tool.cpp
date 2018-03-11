@@ -7,6 +7,13 @@ int Tool::s2i(string str) {
     return num;
 }
 
+double Tool::s2d(string str) {
+    double num;
+    stringstream stream(str);
+    stream >> num;
+    return num;
+}
+
 string Tool::d2s(double num)
 {
     std::ostringstream strs;

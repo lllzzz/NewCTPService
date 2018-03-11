@@ -71,5 +71,14 @@ public:
     bool checkOrder(CThostFtdcTradeField *pTrade) {return true;};
 };
 
+class MessageFAKProcesser: public MessageProcesser
+{
+public:
+    MessageFAKProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
+    bool process(Json::Value);
+    void response(Json::Value);
+    void setOrderInfo(CThostFtdcOrderField *pOrder);
+    bool checkOrder(CThostFtdcTradeField *pTrade);
+};
 
 #endif

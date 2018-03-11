@@ -123,10 +123,9 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 
     msgSrv->fire(TICK + iid, tick);
 
-    Cache* cache = Cache::getInstance();
-    cache->set(CACHE_KEY_IID_LAST_PRICE + iid, Tool::d2s(pDepthMarketData->LastPrice));
-    cache->set(CACHE_KEY_IID_UPPER_PRICE + iid, Tool::d2s(pDepthMarketData->UpperLimitPrice));
-    cache->set(CACHE_KEY_IID_LOWER_PRICE + iid, Tool::d2s(pDepthMarketData->LowerLimitPrice));
+    ShareData::setLastPrice(iid, pDepthMarketData->LastPrice);
+    ShareData::setUpperPrice(iid, pDepthMarketData->UpperLimitPrice);
+    ShareData::setLowerPrice(iid, pDepthMarketData->LowerLimitPrice);
 
 }
 

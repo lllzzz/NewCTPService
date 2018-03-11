@@ -44,7 +44,7 @@ TdSpi::TdSpi()
 
 void TdSpi::OnFrontConnected()
 {
-    LOG(INFO) << "On Connected";
+    LOG(INFO) << "ON CONNECTED";
 
     _brokerId = Config::get("brokerId");
     _userId = Config::get("userId");
@@ -64,7 +64,7 @@ void TdSpi::OnFrontConnected()
 
 void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On Login";
+    LOG(INFO) << "ON LOGIN";
 
     if (pRspInfo && pRspInfo->ErrorID != 0) {
         LOG(INFO) << "ERROR" << "|"
@@ -99,7 +99,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 
 void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On Confirm";
+    LOG(INFO) << "ON CONFIRM";
 
     if (pRspInfo && pRspInfo->ErrorID != 0) {
         LOG(INFO) << "ERROR" << "|"
