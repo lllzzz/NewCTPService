@@ -13,6 +13,7 @@ void TdSpi::addProcesser(MessageProcesser* processer)
 {
     processer->tdReqId = _maxOrderRef++;
     _processerMap[processer->tdReqId] = processer;
+    _tdReqIdMap[processer->getId()] = processer->tdReqId;
 }
 
 void TdSpi::_clearProcesser(int reqId)
@@ -25,6 +26,7 @@ TdSpi::TdSpi()
 {
     _reqId = 1;
     _processerMap = map<int, MessageProcesser*>();
+    _tdReqIdMap = map<string, int>();
 
     string tdFlow = Config::get("path", "tdFlow");
     string tdFront = Config::get("tdFront");
@@ -188,7 +190,7 @@ int TdSpi::trade(int tdReqId, string iid,
             THOST_FTDC_HFEN_Speculation, THOST_FTDC_OPT_LimitPrice, timeCondition, volumeCondition, condition);
 
     int res = _tApi->ReqOrderInsert(&order, tdReqId);
-    LOG(INFO) << "API_TRADE" << "|" << tdReqId << "|" << res;
+    LOG(INFO) << "API TRADE" << "|" << tdReqId << "|" << res;
     if (res != 0) return res;
 
 }
@@ -331,47 +333,34 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 }
 
 
-// void TdSpi::cancel(int appKey, int orderID)
-// {
-//     if (!_isExistOrder(appKey, orderID)) {
-//         _rspMsg(appKey, CODE_ERR_ORDER_NOT_EXIST, "撤销订单不存在");
-//         return;
-//     }
-//     OrderInfo info = _orderInfoViaAO[appKey][orderID];
+int TdSpi::cancel(std::string id)
+{
+    LOG(INFO) << "CANCEL" << "|" << id;
+    int tdReqId = _tdReqIdMap[id];
+    MessageProcesser* tradeProcesser = _processerMap[tdReqId];
 
-//     // log
-//     _logger->push("appKey", Lib::itos(appKey));
-//     _logger->push("iid", string(info.iid));
-//     _logger->push("orderID", Lib::itos(orderID));
-//     _logger->push("orderRef", Lib::itos(info.orderRef));
-//     _logger->info("TdSpi[cancel]");
+    CThostFtdcInputOrderActionField req = {0};
 
-//     CThostFtdcInputOrderActionField req = {0};
+    ///投资者代码
+    strncpy(req.InvestorID, _userId.c_str(), sizeof(TThostFtdcInvestorIDType));
+    ///报单引用
+    strncpy(req.OrderRef, Tool::i2s(tdReqId).c_str(), sizeof(TThostFtdcOrderRefType));
+    ///前置编号
+    req.FrontID = _frontId;
+    ///会话编号
+    req.SessionID = _sessionId;
+    ///合约代码
+    strncpy(req.InstrumentID, tradeProcesser->getIid().c_str(), sizeof(TThostFtdcInstrumentIDType));
+    ///操作标志
+    req.ActionFlag = THOST_FTDC_AF_Delete;
 
-//     ///投资者代码
-//     strncpy(req.InvestorID, info.iID, sizeof(TThostFtdcInvestorIDType));
-//     ///报单引用
-//     strncpy(req.OrderRef, info.oRef, sizeof(TThostFtdcOrderRefType));
-//     ///前置编号
-//     req.FrontID = _frontId;
-//     ///会话编号
-//     req.SessionID = _sessionId;
-//     ///合约代码
-//     strncpy(req.InstrumentID, Lib::stoc(info.iid), sizeof(TThostFtdcInstrumentIDType));
-//     ///操作标志
-//     req.ActionFlag = THOST_FTDC_AF_Delete;
 
-//     int tryTimes = 3;
-//     while (tryTimes--) {
-//         int res = _tApi->ReqOrderAction(&req, info.orderRef);
-//         _logger->request("TdSpi[cancel]", info.orderRef, res);
-//         if (res == 0) break;
-//         if (tryTimes == 0 && res < 0) {
-//             _rspMsg(appKey, res, "订单撤销失败", orderID);
-//         }
-//     }
-//     _incrCancelTimes();
-// }
+    int res = _tApi->ReqOrderAction(&req, tdReqId);
+    LOG(INFO) << "API CANCEL" << "|" << tdReqId << "|" << res;
+    if (res != 0) return res;
+
+    return 0;
+}
 
 
 // void TdSpi::_onCancel(CThostFtdcOrderField *pOrder)

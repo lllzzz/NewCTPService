@@ -43,4 +43,11 @@ public:
     bool process(string);
 };
 
+class MessageCancelHandler: public MessageHandler
+{
+public:
+    MessageCancelHandler(string name):MessageHandler(name) {};
+    bool process(string);
+};
+
 #endif

@@ -15,6 +15,14 @@ string Tool::d2s(double num)
     return str;
 };
 
+string Tool::i2s(int num)
+{
+    std::ostringstream strs;
+    strs << num;
+    std::string str = strs.str();
+    return str;
+};
+
 string Tool::getDateTime(string format)
 {
     struct timeval tv;

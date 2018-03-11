@@ -25,6 +25,7 @@ bool MessageNormalTradeProcesser::process(Json::Value data)
 
     // 异步保存交易数据
     data["tdReqId"] = tdReqId;
+    data["action"] = "TRADE";
     Cache::getInstance()->push(data);
     return true;
 }
@@ -39,6 +40,7 @@ void MessageNormalTradeProcesser::response(Json::Value data)
     req["code"] = 0;
     req["data"] = data;
     MessageService::getInstance()->fire(RESPONSE_NORMAL_TRADE, req);
+    data["action"] = "TRADED";
     Cache::getInstance()->push(data);
 }
 

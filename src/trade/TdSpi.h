@@ -25,6 +25,7 @@ private:
     static TdSpi* instance;
 
     std::map<int, MessageProcesser*> _processerMap;
+    std::map<string, int> _tdReqIdMap;
 
     int _reqId;
 
@@ -93,7 +94,7 @@ public:
         bool isOpen, bool isBuy, int total, double price, bool isToday, 
         TThostFtdcTimeConditionType timeCondition,
         TThostFtdcVolumeConditionType volumeCondition); // ReqOrderInsert
-    // void cancel(int, int); // ReqOrderAction
+    int cancel(string); // ReqOrderAction
     void OnRtnOrder(CThostFtdcOrderField *pOrder);
     void OnRtnTrade(CThostFtdcTradeField *pTrade);
 

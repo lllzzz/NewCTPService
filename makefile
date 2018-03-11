@@ -1,5 +1,6 @@
 common = Config.o Tool.o Cache.o MessageService.o
-trade = MessageNormalTradeProcesser.o MessageNormalTradeHandler.o
+trade = MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
+		MessageCancelProcesser.o MessageCancelHandler.o
 
 
 market.o: src/market/main.cpp
@@ -36,6 +37,11 @@ MessageNormalTradeHandler.o: src/message/MessageHandler.h src/message/normal_tra
 MessageNormalTradeProcesser.o: src/message/MessageProcesser.h src/message/normal_trade/MessageNormalTradeProcesser.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeProcesser.cpp
 
+MessageCancelHandler.o: src/message/MessageHandler.h src/message/cancel/MessageCancelHandler.cpp
+	g++ -c src/message/cancel/MessageCancelHandler.cpp
+
+MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
+	g++ -c src/message/cancel/MessageCancelProcesser.cpp
 
 
 market: market.o MdSpi.o $(common)
