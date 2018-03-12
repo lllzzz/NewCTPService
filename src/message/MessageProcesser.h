@@ -90,4 +90,22 @@ public:
     bool process(Json::Value);
 };
 
+class MessageFOKProcesser: public MessageTradeProcesser
+{
+public:
+    MessageFOKProcesser(string id, string from, string iid):MessageTradeProcesser(id, from, iid) {
+        _tunnelName = RESPONSE_FOK;
+    };
+    bool process(Json::Value);
+};
+
+class MessageIOCProcesser: public MessageTradeProcesser
+{
+public:
+    MessageIOCProcesser(string id, string from, string iid):MessageTradeProcesser(id, from, iid) {
+        _tunnelName = RESPONSE_IOC;
+    };
+    bool process(Json::Value);
+};
+
 #endif

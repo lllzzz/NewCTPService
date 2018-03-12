@@ -64,4 +64,11 @@ public:
     bool process(string);
 };
 
+class MessageIOCHandler: public MessageHandler
+{
+public:
+    MessageIOCHandler(string name):MessageHandler(name) {};
+    bool process(string);
+};
+
 #endif

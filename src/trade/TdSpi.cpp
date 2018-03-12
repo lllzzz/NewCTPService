@@ -117,16 +117,6 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
     // _confirmDate = string(pSettlementInfoConfirm->ConfirmDate);
 }
 
-// bool TdSpi::_checkReqExist(int tdReqId)
-// {
-//     std::vector<int>::iterator it = find(_reqIdVec.begin(), _reqIdVec.end(), tdReqId);
-//     if (it != _reqIdVec.end()) {
-//         return true;
-//     }
-//     return false;
-
-// }
-
 int TdSpi::trade(int tdReqId, string iid,
     bool isOpen, bool isBuy, int total, double price, bool isToday,
     TThostFtdcTimeConditionType timeCondition,
@@ -165,26 +155,6 @@ int TdSpi::trade(int tdReqId, string iid,
     // TThostFtdcVolumeConditionType volumeCondition = THOST_FTDC_VC_AV;
     // TThostFtdcOrderPriceTypeType priceType = THOST_FTDC_OPT_LimitPrice;
 
-    // if (type == ORDER_TYPE_FOK) {
-    //     timeCondition = THOST_FTDC_TC_IOC;
-    //     volumeCondition = THOST_FTDC_VC_CV;
-    // }
-
-    // if (type == ORDER_TYPE_FAK) {
-    //     timeCondition = THOST_FTDC_TC_IOC;
-    //     volumeCondition = THOST_FTDC_VC_AV;
-    // }
-
-    // if (type == ORDER_TYPE_IOC) {
-    //     if (isBuy) {
-    //         string upper = Redis::getRds("tl")->get("UPPERLIMITPRICE_" + iid);
-    //         price = Lib::stod(upper);
-    //     } else {
-    //         string lower = Redis::getRds("tl")->get("LOWERLIMITPRICE_" + iid);
-    //         price = Lib::stod(lower);
-    //     }
-    // }
-
 
     CThostFtdcInputOrderField order = _createOrder(tdReqId, iid, isBuy, total, price, flag,
             THOST_FTDC_HFEN_Speculation, THOST_FTDC_OPT_LimitPrice, timeCondition, volumeCondition, condition);
@@ -220,55 +190,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         processer->canceled();
     }
 
-    // // log
-    // _logger->push("appKey", Lib::itos(info.appKey));
-    // _logger->push("iid", string(pOrder->InstrumentID));
-    // _logger->push("orderID", Lib::itos(info.orderID));
-    // _logger->push("orderRef", string(pOrder->OrderRef));
-    // _logger->push("orderStatus", Lib::ctos(pOrder->OrderStatus));
-    // _logger->push("VolumeTotalOriginal", Lib::itos(pOrder->VolumeTotalOriginal));
-    // _logger->push("VolumeTraded", Lib::itos(pOrder->VolumeTraded));
-    // _logger->push("VolumeTotal", Lib::itos(pOrder->VolumeTotal));
-    // _logger->push("ZCETotalTradedVolume", Lib::itos(pOrder->ZCETotalTradedVolume));
-    // _logger->push("OrderSysID", string(pOrder->OrderSysID));
-    // _logger->info("TdSpi[OnRtnOrder]");
-
-    // _updateOrder(orderRef, pOrder);
-
-    // if (pOrder->OrderStatus != THOST_FTDC_OST_Canceled) {
-    //     _onOrder(pOrder);
-    // } else {
-    //     _onCancel(pOrder);
-    // }
 }
-
-
-// void TdSpi::_onOrder(CThostFtdcOrderField *pOrder)
-// {
-//     int orderRef = Lib::stoi(string(pOrder->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-
-//     Json::FastWriter writer;
-//     Json::Value data;
-
-//     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
-//     data["type"] = "order";
-//     data["appKey"] = info.appKey;
-//     data["iid"] = pOrder->InstrumentID;
-//     data["orderID"] = info.orderID;
-//     data["frontID"] = _frontId;
-//     data["sessionID"] = _sessionId;
-//     data["orderRef"] = orderRef;
-//     data["insertDate"] = pOrder->InsertDate;
-//     data["insertTime"] = pOrder->InsertTime;
-//     data["localTime"] = time;
-//     data["orderStatus"] = pOrder->OrderStatus;
-//     data["todoVol"] = pOrder->VolumeTotal;
-//     data["orderSysID"] = pOrder->OrderSysID;
-
-//     std::string qStr = writer.write(data);
-//     Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
-// }
 
 
 void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -284,11 +206,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
         LOG(INFO) << "NOT MYTRADE";
         return;
     }
-    // if (strcmp(info.eID, pTrade->ExchangeID) != 0 ||
-    //     strcmp(info.oID, pTrade->OrderSysID) != 0)
-    // { // 不是我的订单
-    //     return;
-    // }
+
     LOG(INFO) << "TRADE INFO" << "|"
         << pTrade->OrderRef << "|"
         << pTrade->InstrumentID << "|"
@@ -309,27 +227,6 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
     // data["exchangeID"] = pTrade->ExchangeID;
     processer->traded(data);
 
-    // data["type"] = "traded";
-    // data["iid"] = pTrade->InstrumentID;
-    // data["orderID"] = info.orderID;
-    // data["realPrice"] = pTrade->Price;
-    // data["successVol"] = pTrade->Volume;
-    // _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
-
-    // string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
-    // data["appKey"] = info.appKey;
-    // data["orderRef"] = pTrade->OrderRef;
-    // data["frontID"] = _frontId;
-    // data["sessionID"] = _sessionId;
-    // data["tradeDate"] = pTrade->TradeDate;
-    // data["tradeTime"] = pTrade->TradeTime;
-    // data["localTime"] = time;
-    // data["successVol"] = pTrade->Volume;
-    // data["tradeID"] = pTrade->TradeID;
-
-    // Json::FastWriter writer;
-    // std::string qStr = writer.write(data);
-    // Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
 }
 
 
@@ -359,47 +256,6 @@ int TdSpi::cancel(std::string id)
     LOG(INFO) << "API CANCEL" << "|" << tdReqId << "|" << res;
     return res;
 }
-
-
-// void TdSpi::_onCancel(CThostFtdcOrderField *pOrder)
-// {
-//     int orderRef = Lib::stoi(string(pOrder->OrderRef));
-//     OrderInfo info = _getOrderByRef(orderRef);
-
-//     // log
-//     _logger->push("appKey", Lib::itos(info.appKey));
-//     _logger->push("iid", string(pOrder->InstrumentID));
-//     _logger->push("orderID", Lib::itos(info.orderID));
-//     _logger->push("orderRef", string(pOrder->OrderRef));
-//     _logger->push("limitPrice", Lib::dtos(pOrder->LimitPrice));
-//     _logger->info("TdSpi[onCancel]");
-
-//     Json::Value data;
-
-//     data["type"] = "canceled";
-//     data["iid"] = pOrder->InstrumentID;
-//     data["orderID"] = info.orderID;
-//     data["price"] = pOrder->LimitPrice;
-//     data["cancelVol"] = pOrder->VolumeTotal;
-
-//     _rspMsg(info.appKey, CODE_SUCCESS, "成功", info.orderID, &data);
-
-//     string time = Lib::getDate("%Y/%m/%d-%H:%M:%S", true);
-//     data["appKey"] = info.appKey;
-//     data["orderRef"] = pOrder->OrderRef;
-//     data["frontID"] = _frontId;
-//     data["sessionID"] = _sessionId;
-//     data["insertDate"] = pOrder->InsertDate;
-//     data["insertTime"] = pOrder->InsertTime;
-//     data["localTime"] = time;
-//     data["orderStatus"] = pOrder->OrderStatus;
-//     data["currentTick"] = Redis::getRds("tl")->get("CURRENT_TICK_" + string(pOrder->InstrumentID));
-//     data["cancelVol"] = pOrder->VolumeTotal;
-
-//     Json::FastWriter writer;
-//     std::string qStr = writer.write(data);
-//     Redis::getRds("tl")->push("Q_TRADE", qStr); // 记录本地数据
-// }
 
 
 void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -466,21 +322,6 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
         << pInputOrderAction->InstrumentID << "|"
         << pRspInfo->ErrorID;
 
-    // if (pRspInfo && pRspInfo->ErrorID != 0) {
-    //     _logger->error("TdSpi[OnRspOrderAction]", pRspInfo, nRequestID, bIsLast);
-    // }
-    // int orderRef = Lib::stoi(string(pInputOrderAction->OrderRef));
-    // OrderInfo info = _getOrderByRef(orderRef);
-    // if (!info.orderID) return;
-
-    // // log
-    // _logger->push("appKey", Lib::itos(info.appKey));
-    // _logger->push("iid", string(pInputOrderAction->InstrumentID));
-    // _logger->push("orderID", Lib::itos(info.orderID));
-    // _logger->push("orderRef", string(pInputOrderAction->OrderRef));
-    // _logger->push("errNo", Lib::itos(pRspInfo->ErrorID));
-    // _logger->info("TdSpi[OnRspOrderAction]");
-
     // _rspMsg(info.appKey, pRspInfo->ErrorID, Lib::g2u(string(pRspInfo->ErrorMsg)), info.orderID);
 
 }
@@ -508,61 +349,6 @@ void TdSpi::OnHeartBeatWarning(int nTimeLapse)
 {
     LOG(INFO) << "ON HEARBEAT WARNING" << "|" << nTimeLapse;
 }
-
-// void TdSpi::_initOrder(int appKey, int orderID, string iid)
-// {
-//     _maxOrderRef++;
-//     OrderInfo info = {0};
-//     info.appKey = appKey;
-//     info.orderID = orderID;
-//     info.orderRef = _maxOrderRef;
-//     info.iid = iid;
-
-//     _orderInfoViaAO[appKey][orderID] = info;
-//     _orderInfoViaR[_maxOrderRef] = info;
-// }
-
-// bool TdSpi::_isExistOrder(int appKey, int orderID)
-// {
-//     std::map<int, std::map<int, OrderInfo> >::iterator it = _orderInfoViaAO.find(appKey);
-//     if (it != _orderInfoViaAO.end()) {
-//         std::map<int, OrderInfo>::iterator i = it->second.find(orderID);
-//         if (i != it->second.end()) return true;
-//     }
-//     return false;
-// }
-
-// OrderInfo TdSpi::_getOrderByRef(int orderRef)
-// {
-//     std::map<int, OrderInfo>::iterator it = _orderInfoViaR.find(orderRef);
-//     if (it != _orderInfoViaR.end()) return it->second;
-//     OrderInfo empty = {0};
-//     return empty;
-// }
-
-// void TdSpi::_updateOrder(int orderRef, CThostFtdcOrderField *pOrder)
-// {
-//     OrderInfo info = _getOrderByRef(orderRef);
-//     strcpy(info.eID, pOrder->ExchangeID);
-//     strcpy(info.oID, pOrder->OrderSysID);
-//     strcpy(info.iID, pOrder->InstrumentID);
-//     strcpy(info.oRef, pOrder->OrderRef);
-//     _orderInfoViaR[orderRef] = info;
-//     _orderInfoViaAO[info.appKey][info.orderID] = info;
-// }
-
-// void TdSpi::_rspMsg(int appKey, int err, string msg, int orderID, Json::Value * data)
-// {
-//     Json::Value rsp;
-//     rsp["err"] = err;
-//     rsp["msg"] = msg;
-//     rsp["orderID"] = orderID;
-//     if (data) rsp["data"] = *data;
-
-//     Json::FastWriter writer;
-//     string jsonStr = writer.write(rsp);
-//     Redis::getRds("t")->pub(_channelRsp + Lib::itos(appKey), jsonStr);
-// }
 
 CThostFtdcInputOrderField TdSpi::_createOrder(int tdReqId, string instrumnetId, bool isBuy, int total, double price,
     // double stopPrice,

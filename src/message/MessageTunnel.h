@@ -12,4 +12,8 @@ const string NORMAL_TRADE = "NORMAL_TRADE"; // 普通下单
 const string RESPONSE_NORMAL_TRADE = "RESPONSE_NORMAL_TRADE_"; // 消息反馈key_from
 const string FAK = "FAK";
 const string RESPONSE_FAK = "RESPONSE_FAK_";
+const string FOK = "FOK";
+const string RESPONSE_FOK = "RESPONSE_FOK_";
+const string IOC = "IOC";
+const string RESPONSE_IOC = "RESPONSE_IOC_";
 #endif

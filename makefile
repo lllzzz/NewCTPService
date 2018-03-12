@@ -2,7 +2,9 @@ common = Config.o Tool.o Cache.o MessageSender.o ShareData.o
 trade = MessageService.o MessageProcesser.o \
 		MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
 		MessageCancelProcesser.o MessageCancelHandler.o \
-		MessageFAKProcesser.o MessageFAKHandler.o
+		MessageFAKProcesser.o MessageFAKHandler.o \
+		MessageFOKProcesser.o MessageFOKHandler.o \
+		MessageIOCProcesser.o MessageIOCHandler.o
 
 
 market.o: src/market/main.cpp
@@ -60,6 +62,17 @@ MessageFAKHandler.o: src/message/MessageHandler.h src/message/fak/MessageFAKHand
 MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
 	g++ -c src/message/fak/MessageFAKProcesser.cpp
 
+MessageFOKHandler.o: src/message/MessageHandler.h src/message/fok/MessageFOKHandler.cpp
+	g++ -c src/message/fok/MessageFOKHandler.cpp
+
+MessageFOKProcesser.o: src/message/MessageProcesser.h src/message/fok/MessageFOKProcesser.cpp
+	g++ -c src/message/fok/MessageFOKProcesser.cpp
+
+MessageIOCHandler.o: src/message/MessageHandler.h src/message/ioc/MessageIOCHandler.cpp
+	g++ -c src/message/ioc/MessageIOCHandler.cpp
+
+MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
+	g++ -c src/message/ioc/MessageIOCProcesser.cpp
 
 market: market.o MdSpi.o $(common)
 	g++ -o bin/marketService market.o MdSpi.o $(common) -ljsoncpp -lglog -lhiredis -lthostmduserapi
