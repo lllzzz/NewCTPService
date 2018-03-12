@@ -102,7 +102,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
         return;
     }
 
-    MessageService* msgSrv = MessageService::getInstance();
+    MessageSender* msgSender = MessageSender::getInstance();
 
     Json::Value tick;
 
@@ -121,7 +121,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
         << tick["iid"] << "|"
         << tick["price"];
 
-    msgSrv->fire(TICK + iid, tick);
+    msgSender->fire(TICK + iid, tick);
 
     ShareData::setLastPrice(iid, pDepthMarketData->LastPrice);
     ShareData::setUpperPrice(iid, pDepthMarketData->UpperLimitPrice);

@@ -9,11 +9,12 @@ TdSpi* TdSpi::getInstance()
     return instance;
 }
 
-void TdSpi::addProcesser(MessageProcesser* processer)
+void TdSpi::addProcesser(MessageTradeProcesser* processer)
 {
-    processer->tdReqId = _maxOrderRef++;
+    processer->tdReqId = ++_maxOrderRef;
     _processerMap[processer->tdReqId] = processer;
     _tdReqIdMap[processer->getId()] = processer->tdReqId;
+    LOG(INFO) << "ADD PROCESSER" << "|" << processer->tdReqId;
 }
 
 void TdSpi::_clearProcesser(int reqId)
@@ -25,7 +26,7 @@ void TdSpi::_clearProcesser(int reqId)
 TdSpi::TdSpi()
 {
     _reqId = 1;
-    _processerMap = map<int, MessageProcesser*>();
+    _processerMap = map<int, MessageTradeProcesser*>();
     _tdReqIdMap = map<string, int>();
 
     string tdFlow = Config::get("path", "tdFlow");
@@ -39,7 +40,6 @@ TdSpi::TdSpi()
 
     _tApi->RegisterFront(const_cast<char*>(tdFront.c_str()));
     _tApi->Init();
-
 }
 
 void TdSpi::OnFrontConnected()
@@ -191,8 +191,7 @@ int TdSpi::trade(int tdReqId, string iid,
 
     int res = _tApi->ReqOrderInsert(&order, tdReqId);
     LOG(INFO) << "API TRADE" << "|" << tdReqId << "|" << res;
-    if (res != 0) return res;
-
+    return res;
 }
 
 
@@ -215,11 +214,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         << pOrder->ZCETotalTradedVolume << "|"
         << pOrder->OrderSysID;
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
+    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
     processer->setOrderInfo(pOrder);
     if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled) {
-        Json::Value data;
-        processer->response(data);
+        processer->canceled();
     }
 
     // // log
@@ -281,8 +279,9 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
         exit(1);
     }
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pTrade->OrderRef))];
+    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pTrade->OrderRef))];
     if (!processer->checkOrder(pTrade)) {
+        LOG(INFO) << "NOT MYTRADE";
         return;
     }
     // if (strcmp(info.eID, pTrade->ExchangeID) != 0 ||
@@ -308,7 +307,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
     data["tradeDate"] = pTrade->TradeDate;
     data["tradeTime"] = pTrade->TradeTime;
     // data["exchangeID"] = pTrade->ExchangeID;
-    processer->response(data);
+    processer->traded(data);
 
     // data["type"] = "traded";
     // data["iid"] = pTrade->InstrumentID;
@@ -338,7 +337,7 @@ int TdSpi::cancel(std::string id)
 {
     LOG(INFO) << "CANCEL" << "|" << id;
     int tdReqId = _tdReqIdMap[id];
-    MessageProcesser* tradeProcesser = _processerMap[tdReqId];
+    MessageTradeProcesser* tradeProcesser = _processerMap[tdReqId];
 
     CThostFtdcInputOrderActionField req = {0};
 
@@ -358,9 +357,7 @@ int TdSpi::cancel(std::string id)
 
     int res = _tApi->ReqOrderAction(&req, tdReqId);
     LOG(INFO) << "API CANCEL" << "|" << tdReqId << "|" << res;
-    if (res != 0) return res;
-
-    return 0;
+    return res;
 }
 
 
@@ -418,7 +415,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
         exit(1);
     }
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
+    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER INSERT INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -438,7 +435,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
         exit(1);
     }
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
+    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -462,7 +459,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
     }
     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
+    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrderAction->OrderRef << "|"

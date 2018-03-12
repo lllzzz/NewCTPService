@@ -22,10 +22,10 @@ MessageService::MessageService()
     }
     LOG(INFO) << "REDIS CONNECT SUCCESS";
 
-    string db = Config::get("redis", "db");
-    redisRet = (redisReply*)redisCommand(redisHandler, "SELECT %s", db.c_str());
-    LOG(INFO) << "REDIS SELECT DB";
-    freeReplyObject(redisRet);
+    // string db = Config::get("redis", "db");
+    // redisRet = (redisReply*)redisCommand(redisHandler, "SELECT %s", db.c_str());
+    // LOG(INFO) << "REDIS SELECT DB";
+    // freeReplyObject(redisRet);
 
     _handlerMap = map<string, MessageHandler*>();
 }
@@ -41,20 +41,6 @@ MessageService* MessageService::getInstance()
     if (NULL == instance)
         instance = new MessageService();
     return instance;
-}
-
-void MessageService::fire(string msgName, Json::Value data)
-{
-    Json::FastWriter writer;
-    string dataStr = writer.write(data);
-    LOG(INFO) << "FIRE" << "|" << msgName << "|" << dataStr;
-    // 消息发送
-    redisRet = (redisReply*)redisCommand(redisHandler, "PUBLISH %s %s", msgName.c_str(), dataStr.c_str());
-    if (!redisRet) {
-        LOG(INFO) << "FIRE ERROR";
-        exit(1);
-    }
-    freeReplyObject(redisRet);
 }
 
 void MessageService::addHandler(MessageHandler* handler)

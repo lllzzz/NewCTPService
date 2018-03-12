@@ -15,8 +15,8 @@ bool MessageCancelHandler::process(string data)
     MessageCancelProcesser* processer = new MessageCancelProcesser(jsonData["id"].asString(),
         jsonData["from"].asString(), jsonData["iid"].asString());
 
-    TdSpi* tdSpi = TdSpi::getInstance();
-    tdSpi->addProcesser(processer);
+    // TdSpi* tdSpi = TdSpi::getInstance();
+    // tdSpi->addProcesser(processer);
     return processer->process(jsonData);
 
 }

@@ -1,5 +1,5 @@
-#ifndef MESSAGESERVICE_H
-#define MESSAGESERVICE_H
+#ifndef MESSAGESENDER_H
+#define MESSAGESENDER_H
 
 #include <string>
 #include <iostream>
@@ -16,7 +16,10 @@
 
 /**
  *
- * MessageService msgSrv = new MessageService();
+ * MessageSender msgSrv = new MessageSender();
+ * msgSrv.fire("TICK", tickJson);
+ *
+ * MessageSender msgSrv = new MessageSender();
  * MessageHandler msgHandler = new MessageHandler("TRADE");
  * msgSrv.addHandler(msgHandler);
  * msgSrv.run();
@@ -25,28 +28,24 @@
 
 using namespace std;
 
-class MessageService
+class MessageSender
 {
 private:
 
-    MessageService();
+    MessageSender();
 
-    static MessageService* instance;
-
-    std::map<string, MessageHandler*> _handlerMap;
+    static MessageSender* instance;
 
     redisContext* redisHandler;
     redisReply* redisRet;
 
 
 public:
-    ~MessageService();
+    ~MessageSender();
 
-    static MessageService* getInstance();
+    static MessageSender* getInstance();
 
     void fire(string, Json::Value);
-    void run();
-    void addHandler(MessageHandler*);
 };
 
 #endif

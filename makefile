@@ -1,7 +1,8 @@
-common = Config.o Tool.o Cache.o MessageService.o ShareData.o
-trade = MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
+common = Config.o Tool.o Cache.o MessageSender.o ShareData.o
+trade = MessageService.o MessageProcesser.o \
+		MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
 		MessageCancelProcesser.o MessageCancelHandler.o \
-		MessageFAKProcesser.o MessageFAKHandler.o 
+		MessageFAKProcesser.o MessageFAKHandler.o
 
 
 market.o: src/market/main.cpp
@@ -34,6 +35,12 @@ ShareData.o: src/market/ShareData.h src/market/ShareData.cpp
 
 MessageService.o: src/message/MessageService.h src/message/MessageService.cpp
 	g++ -c src/message/MessageService.cpp
+
+MessageSender.o: src/message/MessageSender.h src/message/MessageSender.cpp
+	g++ -c src/message/MessageSender.cpp
+
+MessageProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.cpp
+	g++ -c src/message/MessageProcesser.cpp
 
 MessageNormalTradeHandler.o: src/message/MessageHandler.h src/message/normal_trade/MessageNormalTradeHandler.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeHandler.cpp

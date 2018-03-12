@@ -24,7 +24,7 @@ private:
 
     static TdSpi* instance;
 
-    std::map<int, MessageProcesser*> _processerMap;
+    std::map<int, MessageTradeProcesser*> _processerMap;
     std::map<string, int> _tdReqIdMap;
 
     int _reqId;
@@ -82,7 +82,7 @@ public:
 
     static TdSpi* getInstance();
 
-    void addProcesser(MessageProcesser*);
+    void addProcesser(MessageTradeProcesser*);
 
     // 初始化回调接口
     void OnFrontConnected();
@@ -90,8 +90,8 @@ public:
     void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     // // 下单/撤单
-    int trade(int tdReqId, string iid, 
-        bool isOpen, bool isBuy, int total, double price, bool isToday, 
+    int trade(int tdReqId, string iid,
+        bool isOpen, bool isBuy, int total, double price, bool isToday,
         TThostFtdcTimeConditionType timeCondition,
         TThostFtdcVolumeConditionType volumeCondition); // ReqOrderInsert
     int cancel(string); // ReqOrderAction

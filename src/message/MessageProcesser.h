@@ -22,8 +22,6 @@ protected:
     string _id;
     string _from;
     string _iid;
-    string _exchangeId;
-    string _orderSysId;
 
 public:
 
@@ -46,19 +44,6 @@ public:
     }
 
     virtual bool process(Json::Value)=0;
-    virtual void response(Json::Value)=0;
-    virtual void setOrderInfo(CThostFtdcOrderField *pOrder)=0;
-    virtual bool checkOrder(CThostFtdcTradeField *pTrade)=0;
-};
-
-class MessageNormalTradeProcesser: public MessageProcesser
-{
-public:
-    MessageNormalTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
-    bool process(Json::Value);
-    void response(Json::Value);
-    void setOrderInfo(CThostFtdcOrderField *pOrder);
-    bool checkOrder(CThostFtdcTradeField *pTrade);
 };
 
 class MessageCancelProcesser: public MessageProcesser
@@ -66,19 +51,43 @@ class MessageCancelProcesser: public MessageProcesser
 public:
     MessageCancelProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
     bool process(Json::Value);
-    void response(Json::Value);
-    void setOrderInfo(CThostFtdcOrderField *pOrder) {return;};
-    bool checkOrder(CThostFtdcTradeField *pTrade) {return true;};
 };
 
-class MessageFAKProcesser: public MessageProcesser
+class MessageTradeProcesser: public MessageProcesser
+{
+protected:
+
+    string _exchangeId;
+    string _orderSysId;
+    string _tunnelName;
+
+public:
+    MessageTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
+    virtual bool process(Json::Value)=0;
+    void traded(Json::Value);
+    void canceled();
+    void setOrderInfo(CThostFtdcOrderField*);
+    bool checkOrder(CThostFtdcTradeField*);
+};
+
+
+class MessageNormalTradeProcesser: public MessageTradeProcesser
 {
 public:
-    MessageFAKProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
+    MessageNormalTradeProcesser(string id, string from, string iid):MessageTradeProcesser(id, from, iid) {
+        _tunnelName = RESPONSE_NORMAL_TRADE;
+    };
     bool process(Json::Value);
-    void response(Json::Value);
-    void setOrderInfo(CThostFtdcOrderField *pOrder);
-    bool checkOrder(CThostFtdcTradeField *pTrade);
+};
+
+
+class MessageFAKProcesser: public MessageTradeProcesser
+{
+public:
+    MessageFAKProcesser(string id, string from, string iid):MessageTradeProcesser(id, from, iid) {
+        _tunnelName = RESPONSE_FAK;
+    };
+    bool process(Json::Value);
 };
 
 #endif
