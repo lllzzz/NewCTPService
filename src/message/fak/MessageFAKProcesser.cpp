@@ -36,7 +36,7 @@ bool MessageFAKProcesser::process(Json::Value data)
 
     // 异步保存交易数据
     data["tdReqId"] = tdReqId;
-    data["action"] = "TRADE";
+    data["action"] = "FAK";
     Cache::getInstance()->push(data);
     return true;
 }

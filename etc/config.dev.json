@@ -4,12 +4,21 @@
         "port": 6379,
         "db": 1
     },
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "passwd": "Abc518131!",
+        "name": "ctp_dev"
+    },
     "iids": ["hc1805"],
     "mdFront": "tcp://218.202.237.33:10012",
     "tdFront": "tcp://218.202.237.33:10002",
     "brokerId": "9999",
     "userId": "114128",
     "passwd": "22446688",
+
+    "queueKey": "CTP.DATA.QUEUE",
 
     "is_log_std": 1,
     "path": {

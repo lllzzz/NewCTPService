@@ -219,12 +219,11 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
     Json::Value data;
     data["dealPrice"] = pTrade->Price;
-    data["dealVolumn"] = pTrade->Volume;
+    data["dealVolume"] = pTrade->Volume;
     data["tdReqId"] = pTrade->OrderRef;
     data["tradeId"] = pTrade->TradeID;
     data["tradeDate"] = pTrade->TradeDate;
     data["tradeTime"] = pTrade->TradeTime;
-    // data["exchangeID"] = pTrade->ExchangeID;
     processer->traded(data);
 
 }

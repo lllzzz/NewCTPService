@@ -12,6 +12,7 @@
 bool MessageCancelProcesser::process(Json::Value data)
 {
     LOG(INFO) << "PROCESS START" << "|" << _id;
+    _tradeId = data["tradeId"].asString();
     TdSpi* tdSpi = TdSpi::getInstance();
     int code = tdSpi->cancel(data["tradeId"].asString());
     LOG(INFO) << "PROCESS CANCEL" << "|" << code;
@@ -24,7 +25,6 @@ bool MessageCancelProcesser::process(Json::Value data)
     // }
 
     // 异步保存交易数据
-    data["tdReqId"] = tdReqId;
     data["action"] = "CANCEL";
     Cache::getInstance()->push(data);
     return true;

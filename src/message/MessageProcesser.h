@@ -25,8 +25,6 @@ protected:
 
 public:
 
-    int tdReqId;
-
     MessageProcesser(string id, string from, string iid) {
         _id = id;
         _from = from;
@@ -48,6 +46,8 @@ public:
 
 class MessageCancelProcesser: public MessageProcesser
 {
+private:
+    string _tradeId;
 public:
     MessageCancelProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
     bool process(Json::Value);
@@ -59,9 +59,14 @@ protected:
 
     string _exchangeId;
     string _orderSysId;
+    int _frontId;
+    int _sessionId;
+
     string _tunnelName;
 
 public:
+    int tdReqId;
+
     MessageTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
     virtual bool process(Json::Value)=0;
     void traded(Json::Value);

@@ -37,7 +37,7 @@ bool MessageIOCProcesser::process(Json::Value data)
 
     // 异步保存交易数据
     data["tdReqId"] = tdReqId;
-    data["action"] = "TRADE";
+    data["action"] = "IOC";
     Cache::getInstance()->push(data);
     return true;
 }

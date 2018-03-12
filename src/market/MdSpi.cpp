@@ -109,13 +109,13 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     string iid = string(pDepthMarketData->InstrumentID);
     tick["iid"] = iid;
     tick["price"] = pDepthMarketData->LastPrice;
-    tick["vol"] = pDepthMarketData->Volume;
+    tick["volume"] = pDepthMarketData->Volume;
     tick["time"] = string(pDepthMarketData->ActionDay) + " " + string(pDepthMarketData->UpdateTime);
     tick["msec"] = pDepthMarketData->UpdateMillisec;
-    tick["bid1"] = pDepthMarketData->BidPrice1;
-    tick["bidvol1"] = pDepthMarketData->BidVolume1;
-    tick["ask1"] = pDepthMarketData->AskPrice1;
-    tick["askvol1"] = pDepthMarketData->AskVolume1;
+    tick["bidPrice1"] = pDepthMarketData->BidPrice1;
+    tick["bidVolume1"] = pDepthMarketData->BidVolume1;
+    tick["askPrice1"] = pDepthMarketData->AskPrice1;
+    tick["askVolume1"] = pDepthMarketData->AskVolume1;
 
     LOG(INFO) << "TICK INFO" << "|"
         << tick["iid"] << "|"
@@ -126,6 +126,9 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     ShareData::setLastPrice(iid, pDepthMarketData->LastPrice);
     ShareData::setUpperPrice(iid, pDepthMarketData->UpperLimitPrice);
     ShareData::setLowerPrice(iid, pDepthMarketData->LowerLimitPrice);
+
+    tick["action"] = "TICK";
+    Cache::getInstance()->push(tick);
 
 }
 

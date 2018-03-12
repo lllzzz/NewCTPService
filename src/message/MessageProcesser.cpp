@@ -9,7 +9,7 @@
  *         "from": "test",
  *         "iid": "xxx",
  *         "dealPrice": 2391.1,
- *         "dealVolumn": 1,
+ *         "dealVolume": 1,
  *         "tdReqId": 3,
  *         "tradeId": "123df",
  *         "tradeDate": "2018xxx",
@@ -19,7 +19,7 @@
  */
 void MessageTradeProcesser::traded(Json::Value data)
 {
-    LOG(INFO) << "RESPONSE START" << "|" << _id;
+    LOG(INFO) << "RESPONSE TRADED" << "|" << _id;
     data["iid"] = _iid;
     data["from"] = _from;
     data["id"] = _id;
@@ -28,6 +28,11 @@ void MessageTradeProcesser::traded(Json::Value data)
     req["code"] = 0;
     req["data"] = data;
     MessageSender::getInstance()->fire(_tunnelName + _from, req);
+
+    data["frontId"] = _frontId;
+    data["sessionId"] = _sessionId;
+    data["exchangeId"] = _exchangeId;
+    data["orderSysId"] = _orderSysId;
     Cache::getInstance()->push(data);
 }
 
@@ -44,7 +49,7 @@ void MessageTradeProcesser::traded(Json::Value data)
  */
 void MessageTradeProcesser::canceled()
 {
-    LOG(INFO) << "RESPONSE START" << "|" << _id;
+    LOG(INFO) << "RESPONSE CANCELED" << "|" << _id;
     Json::Value data;
     data["iid"] = _iid;
     data["from"] = _from;
@@ -61,6 +66,8 @@ void MessageTradeProcesser::setOrderInfo(CThostFtdcOrderField *pOrder)
 {
     _exchangeId = string(pOrder->ExchangeID);
     _orderSysId = string(pOrder->OrderSysID);
+    _frontId = pOrder->FrontID;
+    _sessionId = pOrder->SessionID;
 }
 
 bool MessageTradeProcesser::checkOrder(CThostFtdcTradeField *pTrade)

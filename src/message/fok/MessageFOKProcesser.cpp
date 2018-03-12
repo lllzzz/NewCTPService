@@ -36,7 +36,7 @@ bool MessageFOKProcesser::process(Json::Value data)
 
     // 异步保存交易数据
     data["tdReqId"] = tdReqId;
-    data["action"] = "TRADE";
+    data["action"] = "FOK";
     Cache::getInstance()->push(data);
     return true;
 }
