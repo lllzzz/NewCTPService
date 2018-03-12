@@ -93,7 +93,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 
     int res = _tApi->ReqSettlementInfoConfirm(&req, _reqId++);
 
-    LOG(INFO) << "Request Confirm" << "|" << _reqId << "|" << res;
+    LOG(INFO) << "REQUEST CONFIRM" << "|" << _reqId << "|" << res;
 }
 
 
@@ -127,8 +127,8 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 
 // }
 
-int TdSpi::trade(int tdReqId, string iid, 
-    bool isOpen, bool isBuy, int total, double price, bool isToday, 
+int TdSpi::trade(int tdReqId, string iid,
+    bool isOpen, bool isBuy, int total, double price, bool isToday,
     TThostFtdcTimeConditionType timeCondition,
     TThostFtdcVolumeConditionType volumeCondition)
 {
@@ -218,7 +218,8 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
     MessageProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
     processer->setOrderInfo(pOrder);
     if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled) {
-        processer->response((Json::Value*)NULL);
+        Json::Value data;
+        processer->response(data);
     }
 
     // // log
@@ -417,7 +418,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
         exit(1);
     }
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];    
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER INSERT INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -437,7 +438,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
         exit(1);
     }
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))]; 
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -461,7 +462,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
     }
     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
 
-    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))]; 
+    MessageProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrderAction->OrderRef << "|"

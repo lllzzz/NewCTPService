@@ -38,7 +38,7 @@ void MdSpi::OnFrontConnected()
 void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On Login";
+    LOG(INFO) << "ON LOGIN";
     if (pRspInfo && pRspInfo->ErrorID != 0) {
         LOG(INFO) << "ERROR" << "|"
             << pRspInfo->ErrorID << "|"
@@ -67,7 +67,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument,
     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On Sub Data";
+    LOG(INFO) << "ON SUB DATA";
     if (pRspInfo && pRspInfo->ErrorID != 0) {
         LOG(INFO) << "ERROR" << "|"
             << pRspInfo->ErrorID << "|"
@@ -80,7 +80,7 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 
 void MdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-    LOG(INFO) << "On ERROR" << "|"
+    LOG(INFO) << "ON ERROR" << "|"
         << pRspInfo->ErrorID << "|"
         << pRspInfo->ErrorMsg << "|"
         << nRequestID << "|"
@@ -96,9 +96,9 @@ void MdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bI
  */
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-    LOG(INFO) << "On Tick";
+    LOG(INFO) << "ON TICK";
     if (!pDepthMarketData) {
-        LOG(INFO) << "Empty Data";
+        LOG(INFO) << "EMPTY DATA";
         return;
     }
 
@@ -117,7 +117,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     tick["ask1"] = pDepthMarketData->AskPrice1;
     tick["askvol1"] = pDepthMarketData->AskVolume1;
 
-    LOG(INFO) << "Tick Info" << "|"
+    LOG(INFO) << "TICK INFO" << "|"
         << tick["iid"] << "|"
         << tick["price"];
 

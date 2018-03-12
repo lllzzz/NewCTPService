@@ -109,7 +109,7 @@ void MessageService::run()
         int code = redisGetReply(redisHandler, (void**)&redisRet);
         if (!redisRet) {
             LOG(INFO) << "LISTEN ERROR";
-            return;
+            break;
         }
         if (code != REDIS_OK) {
             LOG(INFO) << "LISTEN CODE IS NOT OK";
@@ -117,14 +117,14 @@ void MessageService::run()
         }
         if (redisRet->elements >= 3) {
             name = string(redisRet->element[1]->str);
-            data = string(redisRet->element[2]->str);
-            LOG(INFO) << "LISTEN DATA|" << name << "|" << data;
-            freeReplyObject(redisRet);
-            if (!_handlerMap[name]->process(data)) {
-                LOG(INFO) << "HANDLER FAILED";
+            if (redisRet->element[2]->str) {
+                data = string(redisRet->element[2]->str);
+                LOG(INFO) << "LISTEN DATA|" << name << "|" << data;
+                if (!_handlerMap[name]->process(data)) {
+                    LOG(INFO) << "HANDLER FAILED";
+                }
             }
-        } else {
-            freeReplyObject(redisRet);
         }
+        freeReplyObject(redisRet);
     }
 }

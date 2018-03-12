@@ -16,17 +16,17 @@ bool MessageFAKProcesser::process(Json::Value data)
 {
     LOG(INFO) << "PROCESS START" << "|" << _id;
     TdSpi* tdSpi = TdSpi::getInstance();
-    int code = tdSpi->trade(tdReqId, 
-        data["iid"].asString(), 
+    int code = tdSpi->trade(tdReqId,
+        data["iid"].asString(),
         data["isOpen"].asBool(),
         data["isBuy"].asBool(),
         data["total"].asInt(),
-        data["price"].asDouble(), 
+        data["price"].asDouble(),
         data["isToday"].asBool(),
         THOST_FTDC_TC_IOC,
         THOST_FTDC_VC_AV);
     LOG(INFO) << "PROCESS TRADE" << "|" << code;
-    
+
     if (!code) {
         Json::Value req;
         req["code"] = code;

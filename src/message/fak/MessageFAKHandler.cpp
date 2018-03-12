@@ -12,6 +12,7 @@ bool MessageFAKHandler::process(string data)
         LOG(INFO) << "JSON PARSE FAILED";
         exit(1);
     }
+    LOG(INFO) << jsonData["from"] << jsonData["iid"];
     MessageFAKProcesser* processer = new MessageFAKProcesser(jsonData["id"].asString(),
         jsonData["from"].asString(), jsonData["iid"].asString());
 

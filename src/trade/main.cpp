@@ -16,6 +16,9 @@ int main(int argc, char const *argv[])
     CONFIG_PATH = argv[1];
 
     google::InitGoogleLogging("TRADE");
+    if (Tool::s2i(Config::get("is_log_std"))) {
+        google::SetStderrLogging(google::GLOG_INFO);
+    }
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
 
     MessageService* msgSrv = MessageService::getInstance();

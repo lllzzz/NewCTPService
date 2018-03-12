@@ -5,13 +5,13 @@
         "db": 1
     },
     "iids": ["hc1805"],
-    "mdFront": "tcp://180.168.146.187:10031",
-    "tdFront": "tcp://180.168.146.187:10030",
-    "tFront": "",
+    "mdFront": "tcp://218.202.237.33:10012",
+    "tdFront": "tcp://218.202.237.33:10002",
     "brokerId": "9999",
-    "userId": "058462",
-    "passwd": "Abc518131!",
+    "userId": "114128",
+    "passwd": "22446688",
 
+    "is_log_std": 1,
     "path": {
         "mdFlow": "/home/dev/src/CTPService/flow/m/",
         "tdFlow": "/home/dev/src/CTPService/flow/t/",

@@ -13,7 +13,7 @@ void shutdown(int sig)
     mApi->Release();
     string pidPath = Config::get("path", "pid");
     remove(pidPath.c_str());
-    LOG(INFO) << "Market Stop";
+    LOG(INFO) << "MARKET STOP";
     google::ShutdownGoogleLogging();
 }
 
@@ -33,6 +33,9 @@ int main(int argc, char const *argv[])
     pid.close();
 
     google::InitGoogleLogging("MARKET");
+    if (Tool::s2i(Config::get("is_log_std"))) {
+        google::SetStderrLogging(google::GLOG_INFO);
+    }
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
 
     // 初始化交易接口
