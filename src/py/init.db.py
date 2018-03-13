@@ -28,7 +28,8 @@ for iid in iids:
             `ask_volume1` int(11) NOT NULL DEFAULT '0',
             `mtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
-            UNIQUE KEY idx_token(`token`)
+            UNIQUE KEY idx_token(`token`),
+            KEY idx_time(`time`)
             ) ENGINE=InnoDB CHARSET=utf8;''' % (iid)
     db.insert(sql)
 
@@ -44,19 +45,19 @@ CREATE TABLE IF NOT EXISTS `trade` (
     `ctp_front_id` int(11) NOT NULL DEFAULT '0',
     `ctp_session_id` int(11) NOT NULL DEFAULT '0',
     `ctp_exchange_id` varchar(50) NOT NULL DEFAULT '',
-    `ctp_sys_order_id` varchar(50) NOT NULL DEFAULT '',
+    `ctp_sys_order_id` int(11) NOT NULL DEFAULT 0,
     `ctp_td_req_id` int(11) NOT NULL DEFAULT '0',
     `ctp_trade_id` int(11) NOT NULL DEFAULT '0',
 
     `price` decimal(10,2) NOT NULL DEFAULT '0.00',
-    `volumn` int(11) NOT NULL DEFAULT 0,
+    `volume` int(11) NOT NULL DEFAULT 0,
     `is_buy` int(4) NOT NULL DEFAULT '-1',
     `is_open` int(4) NOT NULL DEFAULT '-1',
     `is_today` int(4) NOT NULL DEFAULT '-1',
     `send_time` char(17) NOT NULL DEFAULT '',
 
     `deal_price` decimal(10,2) NOT NULL DEFAULT '0.00',
-    `deal_volumn` int(11) NOT NULL DEFAULT 0,
+    `deal_volume` int(11) NOT NULL DEFAULT 0,
     `deal_time` char(17) NOT NULL DEFAULT '',
 
     `status` int(11) NOT NULL DEFAULT '0',

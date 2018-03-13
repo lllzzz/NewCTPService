@@ -185,11 +185,19 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         << pOrder->OrderSysID;
 
     MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
-    processer->setOrderInfo(pOrder);
+    LOG(INFO) << processer;
+    LOG(INFO) << processer->getId();
+    if (!processer) {
+        LOG(INFO) << "PROCESSER EMPTY";
+        exit(1);
+    }
+    if (!processer->isSetOrderInfo()) {
+        processer->setOrderInfo(pOrder);
+    }
+
     if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled) {
         processer->canceled();
     }
-
 }
 
 

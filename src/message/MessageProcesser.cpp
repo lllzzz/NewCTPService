@@ -1,6 +1,7 @@
 #include "MessageProcesser.h"
 #include "../message/MessageSender.h"
 
+
 /**
  * {
  *     "code": 0,
@@ -68,6 +69,12 @@ void MessageTradeProcesser::setOrderInfo(CThostFtdcOrderField *pOrder)
     _orderSysId = string(pOrder->OrderSysID);
     _frontId = pOrder->FrontID;
     _sessionId = pOrder->SessionID;
+}
+
+bool MessageTradeProcesser::isSetOrderInfo()
+{
+    if (_sessionId) return true;
+    return false;
 }
 
 bool MessageTradeProcesser::checkOrder(CThostFtdcTradeField *pTrade)

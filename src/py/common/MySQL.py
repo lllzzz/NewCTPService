@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 import MySQLdb
+import MySQLdb.cursors
 from Config import Config
 
 class MySQL():
@@ -17,7 +18,8 @@ class MySQL():
             user = config['mysql']['user'],
             passwd = config['mysql']['passwd'],
             db = config['mysql']['name'],
-            charset='utf8')
+            charset='utf8',
+            cursorclass = MySQLdb.cursors.DictCursor)
         self.cursor = self.db.cursor()
 
 

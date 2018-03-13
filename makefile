@@ -47,31 +47,31 @@ MessageProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.
 MessageNormalTradeHandler.o: src/message/MessageHandler.h src/message/normal_trade/MessageNormalTradeHandler.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeHandler.cpp
 
-MessageNormalTradeProcesser.o: src/message/MessageProcesser.h src/message/normal_trade/MessageNormalTradeProcesser.cpp
+MessageNormalTradeProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/normal_trade/MessageNormalTradeProcesser.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeProcesser.cpp
 
 MessageCancelHandler.o: src/message/MessageHandler.h src/message/cancel/MessageCancelHandler.cpp
 	g++ -c src/message/cancel/MessageCancelHandler.cpp
 
-MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
+MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
 	g++ -c src/message/cancel/MessageCancelProcesser.cpp
 
 MessageFAKHandler.o: src/message/MessageHandler.h src/message/fak/MessageFAKHandler.cpp
 	g++ -c src/message/fak/MessageFAKHandler.cpp
 
-MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
+MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
 	g++ -c src/message/fak/MessageFAKProcesser.cpp
 
 MessageFOKHandler.o: src/message/MessageHandler.h src/message/fok/MessageFOKHandler.cpp
 	g++ -c src/message/fok/MessageFOKHandler.cpp
 
-MessageFOKProcesser.o: src/message/MessageProcesser.h src/message/fok/MessageFOKProcesser.cpp
+MessageFOKProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/fok/MessageFOKProcesser.cpp
 	g++ -c src/message/fok/MessageFOKProcesser.cpp
 
 MessageIOCHandler.o: src/message/MessageHandler.h src/message/ioc/MessageIOCHandler.cpp
 	g++ -c src/message/ioc/MessageIOCHandler.cpp
 
-MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
+MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
 	g++ -c src/message/ioc/MessageIOCProcesser.cpp
 
 market: market.o MdSpi.o $(common)

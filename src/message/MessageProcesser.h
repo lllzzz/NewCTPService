@@ -67,12 +67,18 @@ protected:
 public:
     int tdReqId;
 
-    MessageTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
+    MessageTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {
+        _sessionId = 0;
+        _frontId = 0;
+        _exchangeId = "";
+        _orderSysId = "";
+    };
     virtual bool process(Json::Value)=0;
     void traded(Json::Value);
     void canceled();
     void setOrderInfo(CThostFtdcOrderField*);
     bool checkOrder(CThostFtdcTradeField*);
+    bool isSetOrderInfo();
 };
 
 
