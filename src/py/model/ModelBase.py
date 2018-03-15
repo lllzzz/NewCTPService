@@ -5,10 +5,10 @@ from common.Config import Config
 
 class ModelBase(object):
     """docstring for ModelBase"""
-    def __init__(self, appFrom, tradeSrv):
-        self.appFrom = appFrom
+    def __init__(self, appKey, tradeSrv):
+        self.appKey = appKey
         self.tradeSrv = tradeSrv
-        self.appConfig = Config.get()['app'][appFrom]
+        self.appConfig = Config.get()['app'][appKey]
 
     def onTick(self, tick):
         raise Exception("on tick mast rewrite")

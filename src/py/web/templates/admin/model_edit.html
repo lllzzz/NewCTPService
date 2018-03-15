@@ -1,6 +1,7 @@
 {% extends 'admin/model/create.html' %}
 
 {% block body %}
+    <link rel="stylesheet" type="text/css" href="/static/codemirror.css">
     {% block navlinks %}
     <ul class="nav nav-tabs">
         <li>
@@ -60,4 +61,15 @@
 {% block tail %}
     {{ super() }}
     {{ lib.form_js() }}
+    <script type="text/javascript" src="/static/codemirror.js"></script>
+    <script type="text/javascript" src="/static/python.js"></script>
+    <script>
+    $(function() {
+        var CodeMirrorEditor = CodeMirror.fromTextArea($('#source').get(0), {
+            lineNumbers: true,
+            indentUnit: 4,
+            viewportMargin: 30
+        });
+    })
+    </script>
 {% endblock %}

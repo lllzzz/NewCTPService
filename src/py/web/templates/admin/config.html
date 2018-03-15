@@ -1,6 +1,7 @@
 {% extends 'admin/model/edit.html' %}
 
 {% block body %}
+    <link rel="stylesheet" type="text/css" href="/static/codemirror.css">
     <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
         <fieldset>
             <div class="control-group">
@@ -24,4 +25,13 @@
 {% block tail %}
     {{ super() }}
     {{ lib.form_js() }}
+    <script type="text/javascript" src="/static/codemirror.js"></script>
+    <script type="text/javascript" src="/static/javascript.js"></script>
+    <script>
+    $(function() {
+        var CodeMirrorEditor = CodeMirror.fromTextArea($('#config').get(0), {
+            lineNumbers: true
+        });
+    })
+    </script>
 {% endblock %}

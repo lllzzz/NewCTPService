@@ -8,10 +8,10 @@
             "iids": [
                 "hc1805"
             ], 
-            "class": "DemoModel", 
-            "module": "model.DemoModel"
+            "class": "TestModel", 
+            "module": "model.TestModel"
         }, 
-        "TestModel": {
+        "demo": {
             "lbtest": {
                 "startDate": "2018-03-12", 
                 "endDate": "2018-03-13"
@@ -19,8 +19,8 @@
             "iids": [
                 "hc1805"
             ], 
-            "class": "TestModel", 
-            "module": "model.TestModel"
+            "class": "DemoModel", 
+            "module": "model.DemoModel"
         }
     }, 
     "redis": {
@@ -31,8 +31,8 @@
     "mysql": {
         "passwd": "Abc518131!", 
         "host": "127.0.0.1", 
+        "user": "root", 
         "port": 3306, 
-        "name": "ctp_dev", 
-        "user": "root"
+        "name": "ctp_dev"
     }
 }
