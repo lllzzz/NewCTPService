@@ -1,30 +1,21 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 #
-from common.Config import Config
 from common.Tool import Tool
-from common.MySQL import MySQL
 import demjson as JSON
 import random
 import datetime
 
-class LookingBackTestService():
+class TestService():
     """docstring for TradeService"""
 
-    def __init__(self, appFrom, startDate, endDate, isRandom = False, randomBorder = 2):
-        self.config = Config.get()
-        self.db = MySQL()
+    def __init__(self, appFrom, moduleName, className, dataSrv, isRandom = False, randomBorder = 2):
 
         self.appFrom = appFrom
-        self.appConfig = self.config['app'][appFrom]
-        self.iids = self.appConfig['iids']
+        self.dataSrv = dataSrv
         self.isRandom = isRandom
         self.randomBorder = randomBorder
-        self.historyDate = startDate
-        self.endDate = endDate
 
-        moduleName = self.appConfig['module']
-        className = self.appConfig['class']
         moduleMeta = __import__(moduleName, globals(), locals(), [className])
         classMeta = getattr(moduleMeta, className)
         self.model = classMeta(appFrom, self)
@@ -78,28 +69,14 @@ class LookingBackTestService():
         self.model.tradeCancel(tradeId)
         self.tradeIds.remove(tradeId)
 
-    def getDataBatch(self, iid, date):
-        sql = '''
-            SELECT * FROM `tick_%s` WHERE `time` LIKE '%s%%'  ORDER BY `time`, `msec`
-        ''' % (iid, date)
-        isOK, data = self.db.getAll(sql)
-        return data
-
-    def getData(self, date):
-        if len(self.iids) == 1:
-            iid = self.iids[0]
-            data = self.getDataBatch(filter(lambda x:x not in '0123456789', iid), date)
-        # for iid in self.iids:
-        return data
 
     def run(self):
 
         while True:
 
-            if (self.endDate - self.historyDate).total_seconds() < 86400: break
+            if (self.dataSrv.isOver()): break
 
-            ticks = self.getData(self.historyDate.strftime("%Y%m%d"))
-            self.historyDate = self.historyDate + datetime.timedelta(days=1)
+            ticks = self.dataSrv.getData()
 
             for tick in ticks:
                 self.model.onTick(tick)

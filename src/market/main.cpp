@@ -8,14 +8,14 @@ string CONFIG_PATH;
 CThostFtdcMdApi * mApi;
 // string pidPath;
 
-void shutdown(int sig)
-{
-    mApi->Release();
-    string pidPath = Config::get("path", "pid");
-    remove(pidPath.c_str());
-    LOG(INFO) << "MARKET STOP";
-    google::ShutdownGoogleLogging();
-}
+// void shutdown(int sig)
+// {
+//     mApi->Release();
+//     string pidPath = Config::get("path", "pid");
+//     remove(pidPath.c_str());
+//     LOG(INFO) << "MARKET STOP";
+//     google::ShutdownGoogleLogging();
+// }
 
 int main(int argc, char const *argv[])
 {
@@ -25,12 +25,12 @@ int main(int argc, char const *argv[])
     }
     CONFIG_PATH = argv[1];
 
-    signal(30, shutdown);
-    ofstream pid;
-    string pidPath = Config::get("path", "pid");
-    pid.open(pidPath.c_str(), ios::out);
-    pid << getpid();
-    pid.close();
+    // signal(30, shutdown);
+    // ofstream pid;
+    // string pidPath = Config::get("path", "pid");
+    // pid.open(pidPath.c_str(), ios::out);
+    // pid << getpid();
+    // pid.close();
 
     google::InitGoogleLogging("MARKET");
     if (Tool::s2i(Config::get("is_log_std"))) {

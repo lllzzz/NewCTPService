@@ -7,14 +7,14 @@ from common.Config import Config
 from common.Redis import Redis
 import datetime
 
-from service.LookingBackTestService import LookingBackTestService
+from service.TestService import TestService
+from service.TestDataService import TestDataService
 
 appForm = sys.argv[1]
-config = Config.get()
-apps = config['app']
+moduleName = sys.argv[2]
+className = sys.argv[3]
 
-srv = LookingBackTestService(appForm, 
-    datetime.datetime.strptime('2018-03-12','%Y-%m-%d'), 
-    datetime.datetime.strptime('2018-03-13','%Y-%m-%d'), 
-    True, 5)
+dataSrv = TestDataService()
+
+srv = TestService(appForm, moduleName, className, dataSrv, False)
 srv.run()

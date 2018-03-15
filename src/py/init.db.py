@@ -68,3 +68,17 @@ CREATE TABLE IF NOT EXISTS `trade` (
 ) ENGINE=InnoDB CHARSET=utf8;
 '''
 db.insert(sql)
+
+
+sql = '''
+CREATE TABLE IF NOT EXISTS `model` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(50) NOT NULL DEFAULT '',
+    `class_name` varchar(50) NOT NULL DEFAULT '',
+    `source` text,
+    `status` int(11) NOT NULL DEFAULT '',
+    `mtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARSET=utf8;
+'''
+db.insert(sql)

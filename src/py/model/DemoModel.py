@@ -16,9 +16,8 @@ class DemoModel(ModelBase):
         # if self.num % 30 == 0:
         #     self.tradeIOC(tick['iid'], tick['price'], 1, True, True, True)
 
-        if self.num % 30 == 10:
-            self.tradeFOK(tick['iid'], tick['price'], 1, True, True, True)
-            
+        tid = self.tradeFOK(tick['iid'], tick['price'], 1, True, True, True)
+
         # self.tradeFOK("hc1805", 3900, 1, True, True, True)
         # if self.num % 10 == 0:
         #     self.tradeIOC("hc1805", 3900, 1, True, True, True)

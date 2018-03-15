@@ -1,0 +1,63 @@
+{% extends 'admin/model/create.html' %}
+
+{% block body %}
+    {% block navlinks %}
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{{ return_url }}">{{ _gettext('List') }}</a>
+        </li>
+        <li>
+            <a href="{{ get_url('.create_view', url=return_url) }}">{{ _gettext('Create') }}</a>
+        </li>
+        <li class="active">
+            <a href="javascript:void(0)">{{ _gettext('Edit') }}</a>
+        </li>
+    </ul>
+    {% endblock %}
+    <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+        <fieldset>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="name">Name &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <div>
+                        {{ form.name }}
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="class_name">Class Name &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <div>
+                        <input type="text" name="class_name" value="{{ form.class_name.data }}" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="source">Source &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <textarea id="source" name="source" style="width: 100%; height: 500px">{{ form.source.data }}</textarea>
+                </div>
+            </div>
+            <hr>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <a href="/admin/model/test?id={{ id }}" target="_blank" class="btn btn-primary" >Test</a>
+                    <a href="/admin/model/" class="btn btn-primary" >LookingBackTest</a>
+                    <a href="/admin/model/" class="btn btn-danger" >Cancel</a>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    {{ lib.form_js() }}
+{% endblock %}
