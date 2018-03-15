@@ -14,9 +14,11 @@ import subprocess
 import os
 from common.Config import Config
 
+from flask_apscheduler import APScheduler
+
 config = Config.get()
 admin.add_view(CtpModelView(Model, db.session))
-admin.add_view(TickView(TickHc, db.session))
+admin.add_view(TickView(TickHc, db.session, category='Tick'))
 admin.add_view(ConfigView(name='Config'))
 admin.add_view(rediscli.RedisCli(Redis(host=config['redis']['host'], db=config['redis']['db'])))
 

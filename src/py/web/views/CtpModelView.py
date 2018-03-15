@@ -16,6 +16,7 @@ import datetime
 
 class CtpModelView(ModelView):
 
+    column_exclude_list = ['source', 'status']
 
     create_template = 'admin/model_create.html'
     edit_template = 'admin/model_edit.html'

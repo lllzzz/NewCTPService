@@ -6,3 +6,4 @@ class TickView(ModelView):
     can_create = False
     can_edit = False
     can_view_details = True
+
