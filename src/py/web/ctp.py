@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin,BaseView,expose,AdminIndexView
 from flask_basicauth import BasicAuth
 import os
+from common.Config import Config
 
 app = Flask(__name__)
 
@@ -14,7 +15,8 @@ app.config['BASIC_AUTH_PASSWORD'] = 'admin'
 app.config['BASIC_AUTH_FORCE'] = True
 BasicAuth(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Abc518131!@127.0.0.1/ctp_dev'
+config = Config.get()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s/%s' % (config['mysql']['user'], config['mysql']['passwd'], config['mysql']['host'], config['mysql']['name'])
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

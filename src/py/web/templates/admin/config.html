@@ -1,0 +1,27 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block body %}
+    <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+        <fieldset>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="config">config &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <textarea id="config" name="config" style="width: 800px; height: 500px">{{ appStr }}</textarea>
+                </div>
+            </div>
+            <hr>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    {{ lib.form_js() }}
+{% endblock %}

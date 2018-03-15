@@ -18,3 +18,10 @@ class Config():
             load_dict = json.load(load_f)
         return load_dict
 
+
+    @staticmethod
+    def write(jsonContent):
+        env_dist = os.environ
+        path = env_dist.get("CTP_CONFIG_PATH")
+        with open(path, 'w') as load_f:
+            json.dump(jsonContent, load_f, indent=4)

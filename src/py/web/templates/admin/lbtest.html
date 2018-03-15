@@ -1,0 +1,39 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block body %}
+    <form method="POST" action="/admin/model/lbtest/run/" class="admin-form form-horizontal" enctype="multipart/form-data">
+        <fieldset>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="APP KEY">APP KEY &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <input type="text" name="app">
+                </div>
+            </div>
+            <hr>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" value="RUN" />
+                </div>
+            </div>
+            <hr>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="Result Log">Result Log &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <ul style="margin-top: 5px;">
+                        {% for f in files %}
+                        <li><a href="/static/logs/{{ f }}">{{ f }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block tail %}
+
+{% endblock %}

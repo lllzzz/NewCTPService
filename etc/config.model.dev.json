@@ -1,21 +1,38 @@
 {
-    "redis": {
-        "host": "127.0.0.1",
-        "port": 6379,
-        "db": 1
-    },
-    "mysql": {
-        "host": "127.0.0.1",
-        "port": 3306,
-        "user": "root",
-        "passwd": "Abc518131!",
-        "name": "ctp_dev"
-    },
     "app": {
         "test": {
-            "iids": ["hc1805"],
-            "module": "model.DemoModel",
-            "class": "DemoModel"
+            "lbtest": {
+                "startDate": "2018-03-12", 
+                "endDate": "2018-03-13"
+            }, 
+            "iids": [
+                "hc1805"
+            ], 
+            "class": "DemoModel", 
+            "module": "model.DemoModel"
+        }, 
+        "TestModel": {
+            "lbtest": {
+                "startDate": "2018-03-12", 
+                "endDate": "2018-03-13"
+            }, 
+            "iids": [
+                "hc1805"
+            ], 
+            "class": "TestModel", 
+            "module": "model.TestModel"
         }
+    }, 
+    "redis": {
+        "host": "127.0.0.1", 
+        "db": 1, 
+        "port": 6379
+    }, 
+    "mysql": {
+        "passwd": "Abc518131!", 
+        "host": "127.0.0.1", 
+        "port": 3306, 
+        "name": "ctp_dev", 
+        "user": "root"
     }
 }
