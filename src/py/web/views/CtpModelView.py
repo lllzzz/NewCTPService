@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 import sys
-reload(sys)  
+reload(sys)
 sys.setdefaultencoding('utf8')
 
 from flask_admin import BaseView,expose
@@ -131,10 +131,10 @@ class %s(ModelBase):
             'iid': 'hc1808', // 合约
             'price': 3400, // 最新价
             'volume': 340, // 数量
-            'bid1Price': 3333, 
-            'bid1Volume': 300,
-            'ask1Price': 3322,
-            'ask1Volume': 33,
+            'bidPrice1': 3333,
+            'bidVolume1': 300,
+            'askPrice1': 3322,
+            'askVolume1': 33,
             'time': '20180312 11:23:44', // 时间
             'msec': 500, // 毫秒
         }

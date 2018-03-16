@@ -14,7 +14,7 @@ appForm = sys.argv[1]
 moduleName = sys.argv[2]
 className = sys.argv[3]
 
-dataSrv = TestDataService()
+dataSrv = TestDataService(className)
 
 srv = TestService(appForm, moduleName, className, dataSrv, False)
 srv.run()

@@ -1,20 +1,11 @@
 {
     "app": {
-        "test": {
-            "lbtest": {
-                "startDate": "2018-03-12", 
-                "endDate": "2018-03-13"
-            }, 
-            "iids": [
-                "hc1805"
-            ], 
-            "class": "TestModel", 
-            "module": "model.TestModel"
-        }, 
+        "test": {}, 
         "demo": {
             "lbtest": {
                 "startDate": "2018-03-12", 
-                "endDate": "2018-03-13"
+                "endDate": "2018-03-13", 
+                "isRandom": true
             }, 
             "iids": [
                 "hc1805"
@@ -31,8 +22,8 @@
     "mysql": {
         "passwd": "Abc518131!", 
         "host": "127.0.0.1", 
-        "user": "root", 
         "port": 3306, 
-        "name": "ctp_dev"
+        "name": "ctp_dev", 
+        "user": "root"
     }
 }

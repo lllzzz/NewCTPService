@@ -19,8 +19,9 @@ moduleName = apps[appForm]['module']
 className = apps[appForm]['class']
 startDate = apps[appForm]['lbtest']['startDate']
 endDate = apps[appForm]['lbtest']['endDate']
+isRandom = apps[appForm]['lbtest']['isRandom']
 
 dataSrv = LBTestDataService(iids, datetime.datetime.strptime(startDate,'%Y-%m-%d'), datetime.datetime.strptime(endDate,'%Y-%m-%d'))
 
-srv = TestService(appForm, moduleName, className, dataSrv, True, 5)
+srv = TestService(appForm, moduleName, className, dataSrv, isRandom, 5)
 srv.run()
