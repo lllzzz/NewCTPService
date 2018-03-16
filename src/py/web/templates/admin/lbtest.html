@@ -1,7 +1,7 @@
-{% extends 'admin/model/edit.html' %}
+{% extends 'admin/master.html' %}
 
 {% block body %}
-    <form method="POST" action="/admin/model/lbtest/run/" class="admin-form form-horizontal" enctype="multipart/form-data">
+    <form method="POST" action="run/" class="admin-form form-horizontal" enctype="multipart/form-data">
         <fieldset>
             <div class="control-group">
                 <div class="control-label">
@@ -34,6 +34,3 @@
     </form>
 {% endblock %}
 
-{% block tail %}
-
-{% endblock %}
