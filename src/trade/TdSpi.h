@@ -1,6 +1,7 @@
 #ifndef TDSPI_H
 #define TDSPI_H
 
+#include <algorithm>
 #include "../ctp/ThostFtdcTraderApi.h"
 #include "../common/Config.h"
 #include "../common/Tool.h"
@@ -31,6 +32,7 @@ private:
 
     string _brokerId;
     string _userId;
+    vector<string> _iids;
 
     int _frontId;
     int _sessionId;
