@@ -27,6 +27,7 @@ int main(int argc, char const *argv[])
     msgSrv->addHandler(new MessageFAKHandler(FAK)); // 撤单
     msgSrv->addHandler(new MessageFOKHandler(FOK)); // 撤单
     msgSrv->addHandler(new MessageIOCHandler(IOC)); // 撤单
+    msgSrv->addHandler(new MessageQueryHandler(QUERY)); // 查询
     TdSpi::getInstance();
     cout << "Trade服务启动..." << endl;
     msgSrv->run();

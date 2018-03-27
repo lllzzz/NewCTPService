@@ -16,4 +16,6 @@ const string FOK = "FOK";
 const string RESPONSE_FOK = "RESPONSE_FOK_";
 const string IOC = "IOC";
 const string RESPONSE_IOC = "RESPONSE_IOC_";
+const string QUERY = "QUERY";
+const string RESPONSE_QUERY = "RESPONSE_QUERY_";
 #endif

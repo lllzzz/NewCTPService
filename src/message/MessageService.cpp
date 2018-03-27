@@ -45,6 +45,7 @@ MessageService* MessageService::getInstance()
 
 void MessageService::addHandler(MessageHandler* handler)
 {
+    LOG(INFO) << "ADD HANDLER" << "|" << handler->getName();
     _handlerMap[handler->getName()] = handler;
 }
 

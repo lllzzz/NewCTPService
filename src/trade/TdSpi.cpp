@@ -12,14 +12,23 @@ TdSpi* TdSpi::getInstance()
 void TdSpi::addProcesser(MessageTradeProcesser* processer)
 {
     processer->tdReqId = ++_maxOrderRef;
+    _tradeProcesserMap[processer->tdReqId] = processer;
+    _tdReqIdMap[processer->getId()] = processer->tdReqId;
+    LOG(INFO) << "ADD TRADE PROCESSER" << "|" << processer->tdReqId;
+}
+
+void TdSpi::addProcesser(MessageProcesser* processer)
+{
+    processer->tdReqId = ++_maxOrderRef;
     _processerMap[processer->tdReqId] = processer;
     _tdReqIdMap[processer->getId()] = processer->tdReqId;
     LOG(INFO) << "ADD PROCESSER" << "|" << processer->tdReqId;
 }
 
+
 void TdSpi::_clearProcesser(int reqId)
 {
-    _processerMap.erase(reqId);
+    _tradeProcesserMap.erase(reqId);
 }
 
 
@@ -27,7 +36,7 @@ TdSpi::TdSpi()
 {
     _reqId = 1;
     _iids = Config::getV("iids");
-    _processerMap = map<int, MessageTradeProcesser*>();
+    _tradeProcesserMap = map<int, MessageTradeProcesser*>();
     _tdReqIdMap = map<string, int>();
 
     string tdFlow = Config::get("path", "tdFlow");
@@ -189,7 +198,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         << pOrder->ZCETotalTradedVolume << "|"
         << pOrder->OrderSysID;
 
-    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pOrder->OrderRef))];
+    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pOrder->OrderRef))];
     LOG(INFO) << processer;
     LOG(INFO) << processer->getId();
     if (!processer) {
@@ -214,7 +223,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
         exit(1);
     }
 
-    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pTrade->OrderRef))];
+    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pTrade->OrderRef))];
     if (!processer->checkOrder(pTrade)) {
         LOG(INFO) << "NOT MYTRADE";
         return;
@@ -242,18 +251,18 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 }
 
 
-int TdSpi::cancel(std::string id)
+int TdSpi::cancel(int tdReqId, std::string id)
 {
     LOG(INFO) << "CANCEL" << "|" << id;
-    int tdReqId = _tdReqIdMap[id];
-    MessageTradeProcesser* tradeProcesser = _processerMap[tdReqId];
+    int reqId = _tdReqIdMap[id];
+    MessageTradeProcesser* tradeProcesser = _tradeProcesserMap[reqId];
 
     CThostFtdcInputOrderActionField req = {0};
 
     ///投资者代码
     strncpy(req.InvestorID, _userId.c_str(), sizeof(TThostFtdcInvestorIDType));
     ///报单引用
-    strncpy(req.OrderRef, Tool::i2s(tdReqId).c_str(), sizeof(TThostFtdcOrderRefType));
+    strncpy(req.OrderRef, Tool::i2s(reqId).c_str(), sizeof(TThostFtdcOrderRefType));
     ///前置编号
     req.FrontID = _frontId;
     ///会话编号
@@ -262,7 +271,6 @@ int TdSpi::cancel(std::string id)
     strncpy(req.InstrumentID, tradeProcesser->getIid().c_str(), sizeof(TThostFtdcInstrumentIDType));
     ///操作标志
     req.ActionFlag = THOST_FTDC_AF_Delete;
-
 
     int res = _tApi->ReqOrderAction(&req, tdReqId);
     LOG(INFO) << "API CANCEL" << "|" << tdReqId << "|" << res;
@@ -283,7 +291,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
         exit(1);
     }
 
-    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
+    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER INSERT INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -303,7 +311,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
         exit(1);
     }
 
-    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrder->OrderRef))];
+    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -327,7 +335,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
     }
     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
 
-    MessageTradeProcesser* processer = _processerMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
+    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrderAction->OrderRef << "|"
@@ -564,61 +572,55 @@ TdSpi::~TdSpi()
 // }
 
 
-// void TdSpi::qryPosition(int appKey, string iid)
-// {
-//     // 查询合约
-//     CThostFtdcQryInvestorPositionField req = {0};
-//     strcpy(req.BrokerID, Lib::stoc(_brokerID));
-//     strcpy(req.InvestorID, Lib::stoc(_userID));
-//     strcpy(req.InstrumentID, iid.c_str());
+int TdSpi::query(int tdReqId, string iid)
+{
+    // 查询合约
+    CThostFtdcQryInvestorPositionField req = {0};
+    strcpy(req.BrokerID, _brokerId.c_str());
+    strcpy(req.InvestorID, _userId.c_str());
+    strcpy(req.InstrumentID, iid.c_str());
 
-//     int res = _tApi->ReqQryInvestorPosition(&req, _reqId);
-//     _qryReq2App[_reqId] = appKey;
-//     _logger->request("TdSpi[ReqQryInvestorPosition]", _reqId++, res);
-//     if (res < 0) {
-//         _rspMsg(appKey, res, "请求失败");
-//     }
-// }
+    int res = _tApi->ReqQryInvestorPosition(&req, tdReqId);
+    LOG(INFO) << "API QUERY" << "|" << tdReqId << "|" << res;
+    return res;
+}
 
-// void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
-//     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-// {
-//     if (pRspInfo && pRspInfo->ErrorID != 0) {
-//         _logger->error("TdSpi[OnRspQryInvestorPosition]", pRspInfo, nRequestID, bIsLast);
-//         return;
-//     }
+void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
+    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+    LOG(INFO) << "ON QUERY";
 
-//     int appKey = _qryReq2App[nRequestID];
+    if (pRspInfo && pRspInfo->ErrorID != 0) {
+        LOG(INFO) << "ERROR" << "|"
+            << pRspInfo->ErrorID << "|"
+            << pRspInfo->ErrorMsg << "|"
+            << nRequestID << "|"
+            << bIsLast;
+        exit(1);
+    }
 
-//     Json::Value data;
+    LOG(INFO) << "QUERY DATA" << "|"
+        << pInvestorPosition->InstrumentID << "|"
+        << pInvestorPosition->PosiDirection << "|"
+        << pInvestorPosition->PositionDate << "|"
+        << pInvestorPosition->YdPosition << "|"
+        << pInvestorPosition->Position << "|"
+        << pInvestorPosition->OpenVolume << "|"
+        << pInvestorPosition->CloseVolume << "|"
+        << pInvestorPosition->OpenAmount << "|"
+        << pInvestorPosition->CloseAmount << "|"
+        << pInvestorPosition->PositionCost << "|"
+        << pInvestorPosition->UseMargin << "|"
+        << pInvestorPosition->Commission << "|"
+        << pInvestorPosition->CloseProfit << "|"
+        << pInvestorPosition->PositionProfit << "|"
+        << pInvestorPosition->TradingDay << "|"
+        << pInvestorPosition->OpenCost << "|"
+        << pInvestorPosition->TodayPosition << "|"
+        << pInvestorPosition->MarginRateByMoney << "|"
+        << pInvestorPosition->MarginRateByVolume;
 
-//     std::string direct = "";
-//     switch (pInvestorPosition->PosiDirection) {
-//         case THOST_FTDC_PD_Net:
-//             direct = "none";
-//             break;
-//         case THOST_FTDC_PD_Long:
-//             direct = "buy";
-//             break;
-//         case THOST_FTDC_PD_Short:
-//             direct = "sell";
-//             break;
-//         default:
-//             break;
-//     }
-
-//     data["type"] = "position";
-//     data["isLast"] = bIsLast;
-//     data["iid"] = pInvestorPosition->InstrumentID;
-//     data["direction"] = direct;
-//     data["pos"] = pInvestorPosition->Position;
-//     data["tPos"] = pInvestorPosition->TodayPosition;
-//     data["openVol"] = pInvestorPosition->OpenVolume;
-//     data["closeVol"] = pInvestorPosition->CloseVolume;
-//     data["openAmnt"] = pInvestorPosition->OpenAmount;
-//     data["closeAmnt"] = pInvestorPosition->CloseAmount;
-//     _rspMsg(appKey, CODE_SUCCESS, "成功", -1, &data);
-// }
+}
 
 
 // void TdSpi::_incrCancelTimes()
