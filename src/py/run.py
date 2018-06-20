@@ -40,8 +40,9 @@ def test():
         @flask.stream_with_context
         def generate():
             id = request.args.get('id')
+            appKey = request.form.get('appKey') or 'test'
             model = Model.query.get(id)
-            cmd = 'CTP_CONFIG_PATH=%s python src/py/test.py test model.%s %s' % (os.environ.get('CTP_CONFIG_PATH'), model.class_name, model.class_name)
+            cmd = 'CTP_CONFIG_PATH=%s python src/py/test.py %s model.%s %s' % (os.environ.get('CTP_CONFIG_PATH'), appKey, model.class_name, model.class_name)
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             while p.poll() is None:
                 line = p.stdout.read()
