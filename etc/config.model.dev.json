@@ -1,4 +1,8 @@
 {
+    "iids": [
+        "hc", 
+        "abc"
+    ], 
     "app": {
         "test": {}, 
         "demo": {
