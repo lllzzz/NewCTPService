@@ -72,8 +72,12 @@ class TickData(BaseView):
         if request.method == 'POST':
 
             tick = request.form.get('tick')
+            if not tick:
+                return jsonify(code=10002, msg="IID Name cannot be empty")
 
             f = request.files['csv']
+            if not f:
+                return jsonify(code=10002, msg="Please upload csv file")
             tmpPath = '/tmp/%s' % (f.filename)
             f.save(tmpPath)
             csv_reader = csv.reader(open(tmpPath))
