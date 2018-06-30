@@ -20,7 +20,7 @@ from flask_apscheduler import APScheduler
 config = Config.get()
 admin.add_view(CtpModelView(Model, db.session))
 # admin.add_view(TickView(TickHc, db.session, category='Tick'))
-admin.add_view(TickNew(name='Add Tick', category='Tick'))
+# admin.add_view(TickNew(name='Add Tick', category='Tick'))
 admin.add_view(TickData(name='Upload Data', category='Tick'))
 admin.add_view(ConfigView(name='Config'))
 admin.add_view(LBTestView(name='LBTest'))

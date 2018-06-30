@@ -16,18 +16,23 @@ class TickView(ModelView):
     can_view_details = True
 
 
-class TickNew(BaseView):
+class TickData(BaseView):
 
     @expose('/', methods=('GET', 'POST'))
     def index(self):
 
-
         if request.method == 'POST':
+
+            iid = request.form.get('iid')
+            if not iid:
+                return jsonify(code=10002, msg="IID Name cannot be empty")
+
+
             config = Config.get()
-            app = config['app']
 
-            tick = request.form.get('tick')
+            tick = filter(lambda x:x not in '0123456789', iid)
 
+            # add tick table
             if tick not in config['iids']:
                 config['iids'].append(tick)
                 Config.write(config)
@@ -53,27 +58,12 @@ class TickNew(BaseView):
                         ) ENGINE=InnoDB CHARSET=utf8;''' % (tick)
                 mysql.insert(sql)
                 tickModel = createTickModel(tick)
+                tmp_val = app._got_first_request
+                app._got_first_request = False
                 admin.add_view(TickView(tickModel, db.session, category='Tick'))
+                app._got_first_request = tmp_val
 
-
-            return self.render('admin/tick_new.html')
-
-        return self.render('admin/tick_new.html')
-
-
-
-
-
-class TickData(BaseView):
-
-    @expose('/', methods=('GET', 'POST'))
-    def index(self):
-
-        if request.method == 'POST':
-
-            tick = request.form.get('tick')
-            if not tick:
-                return jsonify(code=10002, msg="IID Name cannot be empty")
+            
 
             f = request.files['csv']
             if not f:
@@ -93,7 +83,7 @@ class TickData(BaseView):
                     continue
 
                 total += 1
-                if self.insertTickData(mysql, tick, row):
+                if self.insertTickData(mysql, iid, row):
                     succ += 1                
 
             return jsonify(code=0, msg='ok', data={'total': total, 'succ': succ})
