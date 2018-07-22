@@ -24,18 +24,25 @@ class LBTestDataService():
 
     def getData(self):
         date = self.historyDate.strftime("%Y%m%d")
-        if len(self.iids) == 1:
-            iid = self.iids[0]
-            data = self.getDataBatch(filter(lambda x:x not in '0123456789', iid), date)
-        # for iid in self.iids:
+        tickGroup = []
+        for iid in self.iids:
+            data = self.getDataBatch(iid, date)
+            tickGroup += list(data)
+        # for one in tickGroup:
+        #     print one['iid'], one['time'], one['msec']
+
+        tickGroup = sorted(tickGroup, key=lambda x: (x['time'], x['msec']))
+        # print '>>>>>>>>>>>>'
+        # for one in tickGroup:
+        #     print one['iid'], one['time'], one['msec']
         self.historyDate = self.historyDate + datetime.timedelta(days=1)
-        return data
+        return tickGroup
 
 
     def getDataBatch(self, iid, date):
         sql = '''
             SELECT * FROM `tick_%s` WHERE `time` LIKE '%s%%'  ORDER BY `time`, `msec`
         ''' % (iid, date)
-        print sql
+        # print sql
         isOK, data = self.db.getAll(sql)
         return data

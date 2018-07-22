@@ -29,6 +29,16 @@
             </div>
             <div class="control-group">
                 <div class="control-label">
+                    <label for="name">Model Name &nbsp;</label>
+                </div>
+                <div class="controls">
+                    <div>
+                        {{ form.nick_name }}
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
                     <label for="class_name">Class Name &nbsp;</label>
                 </div>
                 <div class="controls">
@@ -50,6 +60,8 @@
                 <div class="controls">
                     <input type="submit" class="btn btn-primary" value="Save" />
                     <a href="/admin/model/test?id={{ id }}" target="_blank" class="btn btn-primary" >Test</a>
+                    <a href="/admin/model/lbtest?id={{ id }}" target="_blank" class="btn btn-primary" >LBTest</a>
+                    <a href="/admin/model/test?id={{ id }}" target="_blank" class="btn btn-primary" >Online</a>
                     <a href="/admin/model/" class="btn btn-danger" >Cancel</a>
                 </div>
             </div>

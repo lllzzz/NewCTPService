@@ -74,6 +74,7 @@ sql = '''
 CREATE TABLE IF NOT EXISTS `model` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(50) NOT NULL DEFAULT '',
+    `nick_name` varchar(50) NOT NULL DEFAULT '',
     `class_name` varchar(50) NOT NULL DEFAULT '',
     `source` text,
     `status` int(11) NOT NULL DEFAULT '',

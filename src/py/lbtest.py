@@ -1,27 +1,43 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 #
-import sys
-from common.MySQL import MySQL
-from common.Config import Config
-from common.Redis import Redis
+import argparse
 import datetime
 
+from web.models.Model import Model
 from service.TestService import TestService
 from service.LBTestDataService import LBTestDataService
 
-appForm = sys.argv[1]
-config = Config.get()
-apps = config['app']
+parser = argparse.ArgumentParser()
+parser.add_argument('model_name', help='model name')
+parser.add_argument('test_version', help='test version')
+parser.add_argument('iids', help='iids name, use "," to split')
+parser.add_argument('start_date', help='history data start at this date')
+parser.add_argument('end_date', help='history date stop at this date')
+parser.add_argument('-r', '--is_random', action="store_true", help='use slippage point or not, default is False')
+parser.add_argument('-s', '--max_slippage', help='max slippage', type=int, default=5)
+args = parser.parse_args()
 
-iids = apps[appForm]['iids']
-moduleName = apps[appForm]['module']
-className = apps[appForm]['class']
-startDate = apps[appForm]['lbtest']['startDate']
-endDate = apps[appForm]['lbtest']['endDate']
-isRandom = apps[appForm]['lbtest']['isRandom']
+modelName   = args.model_name
+testVersion = args.test_version
+iids        = args.iids.split(',')
+startDate   = args.start_date
+endDate     = args.end_date
+isRandom    = args.is_random
+border      = args.max_slippage
 
-dataSrv = LBTestDataService(iids, datetime.datetime.strptime(startDate,'%Y-%m-%d'), datetime.datetime.strptime(endDate,'%Y-%m-%d'))
+# 获取模型
+m = Model.query.filter(Model.nick_name==modelName).first()
+if not m:
+    print 'Error: model not exist'
+    exit()
 
-srv = TestService(appForm, moduleName, className, dataSrv, isRandom, 5)
+className = m.class_name
+moduleName = 'model.' + className
+
+dataSrv = LBTestDataService(iids,
+    datetime.datetime.strptime(startDate,'%Y-%m-%d'),
+    datetime.datetime.strptime(endDate,'%Y-%m-%d'))
+
+srv = TestService(testVersion, modelName, moduleName, className, dataSrv, isRandom, border)
 srv.run()

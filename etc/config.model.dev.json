@@ -1,33 +1,24 @@
 {
     "iids": [
         "hc", 
-        "abc"
+        "aa", 
+        "bb"
     ], 
-    "app": {
-        "test": {}, 
-        "demo": {
-            "lbtest": {
-                "startDate": "2018-03-12", 
-                "endDate": "2018-03-13", 
-                "isRandom": true
-            }, 
-            "iids": [
-                "hc1805"
-            ], 
-            "class": "DemoModel", 
-            "module": "model.DemoModel"
-        }
-    }, 
+    "appRoot": "/home/dev/src/CTPService", 
     "redis": {
         "host": "127.0.0.1", 
         "db": 1, 
         "port": 6379
     }, 
+    "app": {
+        "test": {}, 
+        "demo": {}
+    }, 
     "mysql": {
         "passwd": "Abc518131!", 
         "host": "127.0.0.1", 
-        "port": 3306, 
+        "user": "root", 
         "name": "ctp_dev", 
-        "user": "root"
+        "port": 3306
     }
 }
