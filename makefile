@@ -1,11 +1,11 @@
-common = Config.o Tool.o Cache.o MessageSender.o ShareData.o
+common = Config.o Tool.o Cache.o Status.o MessageSender.o ShareData.o
 trade = MessageService.o MessageProcesser.o \
 		MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
 		MessageCancelProcesser.o MessageCancelHandler.o \
-		MessageQueryProcesser.o MessageQueryHandler.o \
 		MessageFAKProcesser.o MessageFAKHandler.o \
 		MessageFOKProcesser.o MessageFOKHandler.o \
-		MessageIOCProcesser.o MessageIOCHandler.o
+		MessageIOCProcesser.o MessageIOCHandler.o \
+		MessageQueryProcesser.o MessageQueryHandler.o 
 
 
 market.o: src/market/main.cpp
@@ -28,6 +28,9 @@ Config.o: src/common/Config.h src/common/Config.cpp
 Cache.o: src/common/Cache.h src/common/Cache.cpp
 	g++ -c src/common/Cache.cpp
 
+Status.o: src/common/Status.h src/common/Status.cpp
+	g++ -c src/common/Status.cpp
+
 Tool.o: src/common/Tool.h src/common/Tool.cpp
 	g++ -c src/common/Tool.cpp
 
@@ -48,38 +51,38 @@ MessageProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.
 MessageNormalTradeHandler.o: src/message/MessageHandler.h src/message/normal_trade/MessageNormalTradeHandler.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeHandler.cpp
 
-MessageNormalTradeProcesser.o: src/message/MessageProcesser.h src/message/normal_trade/MessageNormalTradeProcesser.cpp
+MessageNormalTradeProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/normal_trade/MessageNormalTradeProcesser.cpp
 	g++ -c src/message/normal_trade/MessageNormalTradeProcesser.cpp
-
-MessageQueryHandler.o: src/message/MessageHandler.h src/message/query/MessageQueryHandler.cpp
-	g++ -c src/message/query/MessageQueryHandler.cpp
-
-MessageQueryProcesser.o: src/message/MessageProcesser.h src/message/query/MessageQueryProcesser.cpp
-	g++ -c src/message/query/MessageQueryProcesser.cpp
 
 MessageCancelHandler.o: src/message/MessageHandler.h src/message/cancel/MessageCancelHandler.cpp
 	g++ -c src/message/cancel/MessageCancelHandler.cpp
 
-MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
+MessageCancelProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/cancel/MessageCancelProcesser.cpp
 	g++ -c src/message/cancel/MessageCancelProcesser.cpp
 
 MessageFAKHandler.o: src/message/MessageHandler.h src/message/fak/MessageFAKHandler.cpp
 	g++ -c src/message/fak/MessageFAKHandler.cpp
 
-MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
+MessageFAKProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/fak/MessageFAKProcesser.cpp
 	g++ -c src/message/fak/MessageFAKProcesser.cpp
 
 MessageFOKHandler.o: src/message/MessageHandler.h src/message/fok/MessageFOKHandler.cpp
 	g++ -c src/message/fok/MessageFOKHandler.cpp
 
-MessageFOKProcesser.o: src/message/MessageProcesser.h src/message/fok/MessageFOKProcesser.cpp
+MessageFOKProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/fok/MessageFOKProcesser.cpp
 	g++ -c src/message/fok/MessageFOKProcesser.cpp
 
 MessageIOCHandler.o: src/message/MessageHandler.h src/message/ioc/MessageIOCHandler.cpp
 	g++ -c src/message/ioc/MessageIOCHandler.cpp
 
-MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
+MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
 	g++ -c src/message/ioc/MessageIOCProcesser.cpp
+
+MessageQueryHandler.o: src/message/MessageHandler.h src/message/query/MessageQueryHandler.cpp
+	g++ -c src/message/query/MessageQueryHandler.cpp
+
+MessageQueryProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/query/MessageQueryProcesser.cpp
+	g++ -c src/message/query/MessageQueryProcesser.cpp
 
 market: market.o MdSpi.o $(common)
 	g++ -o bin/marketService market.o MdSpi.o $(common) -ljsoncpp -lglog -lhiredis -lthostmduserapi
