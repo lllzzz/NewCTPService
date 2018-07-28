@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
     }
     google::SetLogDestination(google::GLOG_INFO, Config::get("path", "log").c_str());
 
-    MessageService* msgSrv = MessageService::getInstance();
+    MessageService* msgSrv = MessageService::getInstance(SRV_TRADE);
     msgSrv->addHandler(new MessageNormalTradeHandler(NORMAL_TRADE)); // 下单
     msgSrv->addHandler(new MessageCancelHandler(CANCEL)); // 撤单
     msgSrv->addHandler(new MessageFAKHandler(FAK)); // 撤单

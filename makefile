@@ -1,5 +1,6 @@
-common = Config.o Tool.o Cache.o Status.o MessageSender.o ShareData.o
-trade = MessageService.o MessageProcesser.o \
+common = Config.o Tool.o Cache.o Status.o MessageSender.o ShareData.o \
+		 MessageService.o
+trade = MessageProcesser.o \
 		MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
 		MessageCancelProcesser.o MessageCancelHandler.o \
 		MessageFAKProcesser.o MessageFAKHandler.o \

@@ -2,7 +2,7 @@
 
 MessageService* MessageService::instance = NULL;
 
-MessageService::MessageService()
+MessageService::MessageService(string name)
 {
     // 建立Redis链接
     struct timeval timeout = {2, 0}; // 2s超时
@@ -28,6 +28,8 @@ MessageService::MessageService()
     // freeReplyObject(redisRet);
 
     _handlerMap = map<string, MessageHandler*>();
+    _handlerMap[name] = NULL;
+    _name = name;
 }
 
 MessageService::~MessageService()
@@ -36,10 +38,10 @@ MessageService::~MessageService()
     delete redisRet;
 }
 
-MessageService* MessageService::getInstance()
+MessageService* MessageService::getInstance(string name)
 {
     if (NULL == instance)
-        instance = new MessageService();
+        instance = new MessageService(name);
     return instance;
 }
 
@@ -107,6 +109,9 @@ void MessageService::run()
             if (redisRet->element[2]->str) {
                 data = string(redisRet->element[2]->str);
                 LOG(INFO) << "LISTEN DATA|" << name << "|" << data;
+                if (!_handlerMap[name]) {
+                    break;
+                }
                 if (!_handlerMap[name]->process(data)) {
                     LOG(INFO) << "HANDLER FAILED";
                 }

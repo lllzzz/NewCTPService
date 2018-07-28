@@ -20,7 +20,7 @@
 
     "queueKey": "CTP.DATA.QUEUE",
 
-    "is_log_std": 0,
+    "is_log_std": 1,
     "path": {
         "mdFlow": "/home/dev/src/CTPService/flow/m/",
         "tdFlow": "/home/dev/src/CTPService/flow/t/",
