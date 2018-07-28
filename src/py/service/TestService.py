@@ -6,17 +6,27 @@ from common.Tool import Tool
 import demjson as JSON
 import random
 import datetime
+from web.models.Model import Model
 
 class TestService():
     """docstring for TradeService"""
 
-    def __init__(self, testVersion, modelName, moduleName, className, dataSrv, isRandom = False, randomBorder = 2):
+    def __init__(self, testVersion, modelName, dataSrv, isRandom = False, randomBorder = 2):
 
         self.modelName = modelName
         self.testVersion = testVersion
         self.dataSrv = dataSrv
         self.isRandom = isRandom
         self.randomBorder = randomBorder
+
+        # 获取模型
+        m = Model.query.filter(Model.nick_name==modelName).first()
+        if not m:
+            print 'Error: model not exist'
+            exit()
+
+        className = m.class_name
+        moduleName = 'model.' + className
 
         moduleMeta = __import__(moduleName, globals(), locals(), [className])
         classMeta = getattr(moduleMeta, className)

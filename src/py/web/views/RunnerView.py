@@ -90,7 +90,7 @@ def lbtest():
         fd = open('src/py/web/static/logs/lbtest_%s_%s_%s.log' % (modelName, testVersion, now), 'w')
         subprocess.Popen(cmd, shell=True, stdout=fd)
 
-    locking = Locker.getLocking('TEST_SERVICE_RUNNING_')
+    locking = Locker.getLocking('TEST_SERVICE_RUNNING_' + modelName)
     files = []
     for file in os.listdir('src/py/web/static/logs/'):
         if file.find(modelName) > 0:
@@ -98,3 +98,4 @@ def lbtest():
 
 
     return render_template('admin/model_lbtest.html', locking=locking, id=id, logs=files)
+

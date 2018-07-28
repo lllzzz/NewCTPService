@@ -11,7 +11,7 @@ from flask_admin.contrib import rediscli
 from common.Config import Config
 
 # import custom view
-import web.views.TestView
+import web.views.RunnerView
 
 config = Config.get()
 admin.add_view(CtpModelView(Model, db.session))

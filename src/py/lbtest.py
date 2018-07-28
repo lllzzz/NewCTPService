@@ -4,7 +4,6 @@
 import argparse
 import datetime
 
-from web.models.Model import Model
 from service.TestService import TestService
 from service.LBTestDataService import LBTestDataService
 
@@ -26,18 +25,9 @@ endDate     = args.end_date
 isRandom    = args.is_random
 border      = args.max_slippage
 
-# 获取模型
-m = Model.query.filter(Model.nick_name==modelName).first()
-if not m:
-    print 'Error: model not exist'
-    exit()
-
-className = m.class_name
-moduleName = 'model.' + className
-
 dataSrv = LBTestDataService(iids,
     datetime.datetime.strptime(startDate,'%Y-%m-%d'),
     datetime.datetime.strptime(endDate,'%Y-%m-%d'))
 
-srv = TestService(testVersion, modelName, moduleName, className, dataSrv, isRandom, border)
+srv = TestService(testVersion, modelName, dataSrv, isRandom, border)
 srv.run()
