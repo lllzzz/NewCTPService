@@ -1,24 +1,36 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 #
+from common.Locker import Locker
 from common.Tool import Tool
 import demjson as JSON
 import random
 import datetime
+from web.models.Model import Model
 
 class TestService():
     """docstring for TradeService"""
 
-    def __init__(self, appFrom, moduleName, className, dataSrv, isRandom = False, randomBorder = 2):
+    def __init__(self, testVersion, modelName, dataSrv, isRandom = False, randomBorder = 2):
 
-        self.appFrom = appFrom
+        self.modelName = modelName
+        self.testVersion = testVersion
         self.dataSrv = dataSrv
         self.isRandom = isRandom
         self.randomBorder = randomBorder
 
+        # 获取模型
+        m = Model.query.filter(Model.nick_name==modelName).first()
+        if not m:
+            print 'Error: model not exist'
+            exit()
+
+        className = m.class_name
+        moduleName = 'model.' + className
+
         moduleMeta = __import__(moduleName, globals(), locals(), [className])
         classMeta = getattr(moduleMeta, className)
-        self.model = classMeta(appFrom, self)
+        self.model = classMeta(modelName, self)
 
         self.tradeInfo = {}
         self.tradeCallbackTick = {}
@@ -26,7 +38,7 @@ class TestService():
 
 
     def trade(self, iid, price, volume, isOpen, isBuy, isToday):
-        tradeId = Tool.getTradeId(self.appFrom)
+        tradeId = Tool.getTradeId(self.modelName)
 
         r = random.randint(1, 10) if self.isRandom else 10
         self.tradeCallbackTick[tradeId] = 0
@@ -39,7 +51,7 @@ class TestService():
 
 
     def fak(self, iid, price, volume, isOpen, isBuy, isToday):
-        tradeId = Tool.getTradeId(self.appFrom)
+        tradeId = Tool.getTradeId(self.modelName)
         r = random.randint(1, 10) if self.isRandom else 10
         self.tradeCallbackTick[tradeId] = 0
         self.tradeInfo[tradeId] = {'tradeId': tradeId, 'price': price, 'volume': volume, 'type': 'fak', 'r': r}
@@ -48,7 +60,7 @@ class TestService():
 
 
     def fok(self, iid, price, volume, isOpen, isBuy, isToday):
-        tradeId = Tool.getTradeId(self.appFrom)
+        tradeId = Tool.getTradeId(self.modelName)
         r = random.randint(1, 10) if self.isRandom else 10
         self.tradeCallbackTick[tradeId] = 0
         self.tradeInfo[tradeId] = {'tradeId': tradeId, 'price': price, 'volume': volume, 'type': 'fok', 'r': r}
@@ -58,7 +70,7 @@ class TestService():
 
 
     def ioc(self, iid, price, volume, isOpen, isBuy, isToday):
-        tradeId = Tool.getTradeId(self.appFrom)
+        tradeId = Tool.getTradeId(self.modelName)
         self.tradeCallbackTick[tradeId] = 0
         self.tradeInfo[tradeId] = {'tradeId': tradeId, 'price': price, 'volume': volume, 'type': 'ioc', 'isBuy': isBuy}
         self.tradeIds.append(tradeId)
@@ -71,6 +83,9 @@ class TestService():
 
 
     def run(self):
+
+        locker = Locker('TEST_SERVICE_RUNNING_' + self.testVersion)
+        if locker.isLocking(): return
 
         while True:
 

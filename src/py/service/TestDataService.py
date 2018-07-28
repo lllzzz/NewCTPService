@@ -13,9 +13,10 @@ import csv
 class TestDataService():
     """docstring for TradeService"""
 
-    def __init__(self, className):
+    def __init__(self, modelName, dataPath = ''):
         self.over = False
-        self.className = className
+        self.modelName = modelName
+        self.dataPath = dataPath
 
 
     def isOver(self):
@@ -23,12 +24,12 @@ class TestDataService():
 
 
     def getData(self):
-        dataPathDir = 'src/py/web/static/test_data/'
-        dataPath = dataPathDir + self.className + '.csv'
-        if not os.path.exists(dataPath):
-            dataPath = dataPathDir + 'test.csv'
 
-        data = csv.reader(open(dataPath, 'r'))
+        if not os.path.exists(self.dataPath):
+            config = Config.get()
+            self.dataPath = config['appRoot'] + '/src/py/web/static/test_data/test.csv'
+
+        data = csv.reader(open(self.dataPath, 'r'))
         isTitle = True
         title = []
         tickData = []

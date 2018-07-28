@@ -1,6 +1,7 @@
 #include "MdSpi.h"
 #include <signal.h>
 #include "../common/Config.h"
+// #include "../common/Status.h"
 
 using namespace std;
 
@@ -8,14 +9,14 @@ string CONFIG_PATH;
 CThostFtdcMdApi * mApi;
 // string pidPath;
 
-// void shutdown(int sig)
-// {
-//     mApi->Release();
-//     string pidPath = Config::get("path", "pid");
-//     remove(pidPath.c_str());
-//     LOG(INFO) << "MARKET STOP";
-//     google::ShutdownGoogleLogging();
-// }
+void shutdown(int sig)
+{
+    mApi->Release();
+    string pidPath = Config::get("path", "pid");
+    remove(pidPath.c_str());
+    LOG(INFO) << "MARKET STOP";
+    google::ShutdownGoogleLogging();
+}
 
 int main(int argc, char const *argv[])
 {
@@ -24,6 +25,12 @@ int main(int argc, char const *argv[])
         return 1;
     }
     CONFIG_PATH = argv[1];
+    
+    // Status* status = new Status("MARKET_SRV");
+    // if (status->isRunning()) {
+    //     cout << "正在提供服务，不要重复执行" << endl;
+    //     return 1;
+    // }
 
     // signal(30, shutdown);
     // ofstream pid;

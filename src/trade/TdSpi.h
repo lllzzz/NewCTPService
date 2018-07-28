@@ -1,6 +1,7 @@
 #ifndef TDSPI_H
 #define TDSPI_H
 
+#include <algorithm>
 #include "../ctp/ThostFtdcTraderApi.h"
 #include "../common/Config.h"
 #include "../common/Tool.h"
@@ -24,13 +25,15 @@ private:
 
     static TdSpi* instance;
 
-    std::map<int, MessageTradeProcesser*> _processerMap;
+    std::map<int, MessageTradeProcesser*> _tradeProcesserMap; // 交易processer
+    std::map<int, MessageProcesser*> _processerMap; // 其他processer
     std::map<string, int> _tdReqIdMap;
 
     int _reqId;
 
     string _brokerId;
     string _userId;
+    vector<string> _iids;
 
     int _frontId;
     int _sessionId;
@@ -39,13 +42,6 @@ private:
 
     // 清理MessageProcesser对象
     void _clearProcesser(int);
-
-    // // 查询订单存在
-    // std::vector<int> _reqIdVec;
-    // bool _checkReqExist(int);
-
-    // string _confirmDate;
-    // int _cancelTimesMax;
 
 
     // 构造订单
@@ -58,23 +54,6 @@ private:
         TThostFtdcContingentConditionType = THOST_FTDC_CC_Immediately// 触发条件
     );
 
-    // // 处理订单反馈
-    // void _onOrder(CThostFtdcOrderField *);
-    // void _onCancel(CThostFtdcOrderField *);
-
-    // void _incrCancelTimes();
-    // int _getCancelTimes();
-
-    // // 客户端订单
-    // std::map<int, std::map<int, OrderInfo> > _orderInfoViaAO; // appKey => orderID => orderRef
-    // std::map<int, OrderInfo> _orderInfoViaR;
-    // void _initOrder(int, int, string);
-    // bool _isExistOrder(int, int);
-    // OrderInfo _getOrderByRef(int);
-    // void _updateOrder(int, CThostFtdcOrderField *);
-
-    // // 返回通知
-    // void _rspMsg(int, int, string, int = -1, Json::Value* = NULL);
 
 public:
 
@@ -83,6 +62,7 @@ public:
     static TdSpi* getInstance();
 
     void addProcesser(MessageTradeProcesser*);
+    void addProcesser(MessageProcesser*);
 
     // 初始化回调接口
     void OnFrontConnected();
@@ -94,7 +74,8 @@ public:
         bool isOpen, bool isBuy, int total, double price, bool isToday,
         TThostFtdcTimeConditionType timeCondition,
         TThostFtdcVolumeConditionType volumeCondition); // ReqOrderInsert
-    int cancel(string); // ReqOrderAction
+    int cancel(int tdReqId, string tradeId); // ReqOrderAction
+
     void OnRtnOrder(CThostFtdcOrderField *pOrder);
     void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
@@ -103,9 +84,9 @@ public:
     // void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
     // void OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-    // // 持仓查询
-    // void qryPosition(int, string); // ReqQryInvestorPosition
-    // void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+    // 持仓查询
+    int query(int tdReqId, string iid); // ReqQryInvestorPosition
+    void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     // // 异常
     void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

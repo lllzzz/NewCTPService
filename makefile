@@ -1,10 +1,11 @@
-common = Config.o Tool.o Cache.o MessageSender.o ShareData.o
+common = Config.o Tool.o Cache.o Status.o MessageSender.o ShareData.o
 trade = MessageService.o MessageProcesser.o \
 		MessageNormalTradeProcesser.o MessageNormalTradeHandler.o \
 		MessageCancelProcesser.o MessageCancelHandler.o \
 		MessageFAKProcesser.o MessageFAKHandler.o \
 		MessageFOKProcesser.o MessageFOKHandler.o \
-		MessageIOCProcesser.o MessageIOCHandler.o
+		MessageIOCProcesser.o MessageIOCHandler.o \
+		MessageQueryProcesser.o MessageQueryHandler.o 
 
 
 market.o: src/market/main.cpp
@@ -26,6 +27,9 @@ Config.o: src/common/Config.h src/common/Config.cpp
 
 Cache.o: src/common/Cache.h src/common/Cache.cpp
 	g++ -c src/common/Cache.cpp
+
+Status.o: src/common/Status.h src/common/Status.cpp
+	g++ -c src/common/Status.cpp
 
 Tool.o: src/common/Tool.h src/common/Tool.cpp
 	g++ -c src/common/Tool.cpp
@@ -73,6 +77,12 @@ MessageIOCHandler.o: src/message/MessageHandler.h src/message/ioc/MessageIOCHand
 
 MessageIOCProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/ioc/MessageIOCProcesser.cpp
 	g++ -c src/message/ioc/MessageIOCProcesser.cpp
+
+MessageQueryHandler.o: src/message/MessageHandler.h src/message/query/MessageQueryHandler.cpp
+	g++ -c src/message/query/MessageQueryHandler.cpp
+
+MessageQueryProcesser.o: src/message/MessageProcesser.h src/message/MessageProcesser.h src/message/query/MessageQueryProcesser.cpp
+	g++ -c src/message/query/MessageQueryProcesser.cpp
 
 market: market.o MdSpi.o $(common)
 	g++ -o bin/marketService market.o MdSpi.o $(common) -ljsoncpp -lglog -lhiredis -lthostmduserapi

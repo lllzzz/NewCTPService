@@ -71,4 +71,11 @@ public:
     bool process(string);
 };
 
+class MessageQueryHandler: public MessageHandler
+{
+public:
+    MessageQueryHandler(string name):MessageHandler(name) {};
+    bool process(string);
+};
+
 #endif

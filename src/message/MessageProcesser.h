@@ -25,10 +25,13 @@ protected:
 
 public:
 
+    int tdReqId; // tdspi req id
+
     MessageProcesser(string id, string from, string iid) {
         _id = id;
         _from = from;
         _iid = iid;
+        tdReqId = 0;
     };
 
     ~MessageProcesser() {};
@@ -42,6 +45,7 @@ public:
     }
 
     virtual bool process(Json::Value)=0;
+    virtual void callback(Json::Value)=0;
 };
 
 class MessageCancelProcesser: public MessageProcesser
@@ -51,7 +55,18 @@ private:
 public:
     MessageCancelProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
     bool process(Json::Value);
+    void callback(Json::Value data) {};
 };
+
+
+class MessageQueryProcesser: public MessageProcesser
+{
+public:
+    MessageQueryProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {};
+    bool process(Json::Value);
+    void callback(Json::Value);
+};
+
 
 class MessageTradeProcesser: public MessageProcesser
 {
@@ -65,7 +80,6 @@ protected:
     string _tunnelName;
 
 public:
-    int tdReqId;
 
     MessageTradeProcesser(string id, string from, string iid):MessageProcesser(id, from, iid) {
         _sessionId = 0;
@@ -74,6 +88,7 @@ public:
         _orderSysId = "";
     };
     virtual bool process(Json::Value)=0;
+    void callback(Json::Value data) {};
     void traded(Json::Value);
     void canceled();
     void setOrderInfo(CThostFtdcOrderField*);

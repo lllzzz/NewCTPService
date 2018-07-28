@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # -*- encoding:utf-8 -*-
 #
-import sys
-from common.MySQL import MySQL
-from common.Config import Config
-from common.Redis import Redis
-import datetime
+import argparse
 
 from service.TestService import TestService
 from service.TestDataService import TestDataService
 
-appForm = sys.argv[1]
-moduleName = sys.argv[2]
-className = sys.argv[3]
+parser = argparse.ArgumentParser()
+parser.add_argument('model_name', help='model name')
+parser.add_argument('-p', '--data_path', help='test data path')
+args = parser.parse_args()
 
-dataSrv = TestDataService(className)
+modelName = args.model_name
+dataPath = args.data_path or ''
 
-srv = TestService(appForm, moduleName, className, dataSrv, False)
+dataSrv = TestDataService(modelName, dataPath)
+
+srv = TestService(modelName, modelName, dataSrv)
 srv.run()

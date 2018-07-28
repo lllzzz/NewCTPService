@@ -1,0 +1,65 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block body %}
+    <div id="msg" class="alert alert-danger" role="alert" style="display: none"></div>
+    <div id="success" class="alert alert-success" role="alert" style="display: none"></div>
+    <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+        <fieldset>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="iid">IID Name&nbsp;</label>
+                </div>
+                <div class="controls">
+                    <input type="text" name="iid" class="form-control" >
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    <label for="CSV">CSV FILE&nbsp;</label>
+                </div>
+                <div class="controls">
+                    <input type="file" name="csv" class="form-control" >
+                </div>
+            </div>
+            <hr>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="button" id="upload" class="btn btn-primary" value="Upload" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+
+
+{% block tail %}
+    {{ super() }}
+    {{ lib.form_js() }}
+    <script>
+    $(function() {
+
+        $('#upload').click(function() {
+            $('#msg').hide()
+            $('#success').hide()
+            $('#upload').attr('disabled', true)
+            $.ajax({
+                url: '/admin/tickdata/',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: new FormData($('form')[0]),
+                dataType: 'json',
+                success: function(data) {
+                    $('#upload').attr('disabled', false)
+                    if (data.code) {
+                        $('#msg').text(data.msg).show()
+                    } else {
+                        $('#success').text('TOTAL:' + data.data.total + ', SUCCESS:' + data.data.succ).show()
+                        setTimeout("location.reload()", 1000);
+                    }
+                },
+            })
+        })
+    })
+    </script>
+{% endblock %}

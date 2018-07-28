@@ -14,7 +14,7 @@ bool MessageCancelProcesser::process(Json::Value data)
     LOG(INFO) << "PROCESS START" << "|" << _id;
     _tradeId = data["tradeId"].asString();
     TdSpi* tdSpi = TdSpi::getInstance();
-    int code = tdSpi->cancel(data["tradeId"].asString());
+    int code = tdSpi->cancel(tdReqId, data["tradeId"].asString());
     LOG(INFO) << "PROCESS CANCEL" << "|" << code;
 
     // if (!code) {

@@ -5,6 +5,8 @@ from common.Redis import Redis
 from common.Config import Config
 from common.Tool import Tool
 import demjson as JSON
+from web.models.Model import Model
+from common.Locker import Locker
 
 class TradeService():
     """docstring for TradeService"""
@@ -20,21 +22,30 @@ class TradeService():
     TUNNEL_IOC = 'IOC'
     TUNNEL_RESPONSE_IOC = 'RESPONSE_IOC_%s'
 
-    def __init__(self, appFrom):
+    def __init__(self, modelName, version, iids):
         self.server = Redis.get()
         self.sender = Redis.get()
         self.cache = Redis.get()
         self.config = Config.get()
 
-        self.appFrom = appFrom
-        self.appConfig = self.config['app'][appFrom]
-        self.iids = self.appConfig['iids']
+        self.modelName = modelName
+        self.version = version
+        self.globalKey = modelName + version
+        self.appConfig = self.config['app'][modelName]
+        self.iids = iids
 
-        moduleName = self.appConfig['module']
-        className = self.appConfig['class']
+        # 获取模型
+        m = Model.query.filter(Model.nick_name==modelName).first()
+        if not m:
+            print 'Error: model not exist'
+            exit()
+
+        className = m.class_name
+        moduleName = 'model.' + className
+
         moduleMeta = __import__(moduleName, globals(), locals(), [className])
         classMeta = getattr(moduleMeta, className)
-        self.model = classMeta(appFrom, self)
+        self.model = classMeta(modelName, self)
 
     def trade(self, iid, price, volume, isOpen, isBuy, isToday):
         return self.__trade(self.TUNNEL_TRADE, iid, price, volume, isOpen, isBuy, isToday)
@@ -50,8 +61,8 @@ class TradeService():
 
     def cancel(self, iid, tradeId):
         data = {}
-        data['id'] = Tool.getTradeId(self.appFrom)
-        data['from'] = self.appFrom
+        data['id'] = Tool.getTradeId(self.modelName)
+        data['from'] = self.modelName
         data['iid'] = iid
         data['tradeId'] = tradeId
         jsonData = JSON.encode(data)
@@ -61,8 +72,8 @@ class TradeService():
 
     def __trade(self, tunnel, iid, price, volume, isOpen, isBuy, isToday):
         data = {}
-        data['id'] = Tool.getTradeId(self.appFrom)
-        data['from'] = self.appFrom
+        data['id'] = Tool.getTradeId(self.globalKey)
+        data['from'] = self.modelName
         data['iid'] = iid
         data['price'] = price
         data['total'] = volume
@@ -75,16 +86,20 @@ class TradeService():
         return data['id']
 
     def run(self):
+
+        locker = Locker('ONLINE_SERVICE_RUNNING_' + self.globalKey + '_' + ','.join(self.iids))
+        if locker.isLocking(): return
+
         srv = self.server.pubsub()
         tunnel_tick = []
         for iid in self.iids:
             tunnel_tick.append(self.TUNNEL_TICK % iid)
 
         tunnel_rsp = [
-            self.TUNNEL_RESPONSE_TRADE % self.appFrom,
-            self.TUNNEL_RESPONSE_FAK % self.appFrom,
-            self.TUNNEL_RESPONSE_FOK % self.appFrom,
-            self.TUNNEL_RESPONSE_IOC % self.appFrom,
+            self.TUNNEL_RESPONSE_TRADE % self.globalKey,
+            self.TUNNEL_RESPONSE_FAK % self.globalKey,
+            self.TUNNEL_RESPONSE_FOK % self.globalKey,
+            self.TUNNEL_RESPONSE_IOC % self.globalKey,
         ]
 
         srv.subscribe(tunnel_tick + tunnel_rsp)

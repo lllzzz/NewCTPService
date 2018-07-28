@@ -6,6 +6,7 @@ class Model(db.Model):
     __tablename__ = 'model'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, default='')
+    nick_name = db.Column(db.String, default='')
     class_name = db.Column(db.String, default='')
     source = db.Column(db.Text, default='')
     status = db.Column(db.Integer, default=0)
