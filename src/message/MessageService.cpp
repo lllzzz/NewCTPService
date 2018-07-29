@@ -110,7 +110,11 @@ void MessageService::run()
                 data = string(redisRet->element[2]->str);
                 LOG(INFO) << "LISTEN DATA|" << name << "|" << data;
                 if (!_handlerMap[name]) {
-                    break;
+                    if (Tool::s2i(data) == 1) { // 状态
+                        continue;
+                    } else { // 退出
+                        break;
+                    }
                 }
                 if (!_handlerMap[name]->process(data)) {
                     LOG(INFO) << "HANDLER FAILED";

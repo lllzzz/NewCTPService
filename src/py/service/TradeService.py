@@ -22,15 +22,14 @@ class TradeService():
     TUNNEL_IOC = 'IOC'
     TUNNEL_RESPONSE_IOC = 'RESPONSE_IOC_%s'
 
-    def __init__(self, modelName, version, iids):
+    def __init__(self, modelName, iids):
         self.server = Redis.get()
         self.sender = Redis.get()
         self.cache = Redis.get()
         self.config = Config.get()
 
         self.modelName = modelName
-        self.version = version
-        self.globalKey = modelName + version
+        self.globalKey = modelName + ','.join(iids)
         self.appConfig = self.config['app'][modelName]
         self.iids = iids
 
@@ -87,7 +86,7 @@ class TradeService():
 
     def run(self):
 
-        locker = Locker('ONLINE_SERVICE_RUNNING_' + self.globalKey + '_' + ','.join(self.iids))
+        locker = Locker('ONLINE_SERVICE_RUNNING_' + self.globalKey)
         if locker.isLocking(): return
 
         srv = self.server.pubsub()
@@ -100,6 +99,7 @@ class TradeService():
             self.TUNNEL_RESPONSE_FAK % self.globalKey,
             self.TUNNEL_RESPONSE_FOK % self.globalKey,
             self.TUNNEL_RESPONSE_IOC % self.globalKey,
+            self.globalKey,
         ]
 
         srv.subscribe(tunnel_tick + tunnel_rsp)
@@ -107,6 +107,13 @@ class TradeService():
             print msg
             if msg['type'] != 'message': continue
             tunnel = msg['channel']
+
+            if tunnel == self.globalKey:
+                if msg['data'] == 'STOP':
+                    break
+                else:
+                    continue
+
             data = JSON.decode(msg['data'])
 
             if tunnel in tunnel_tick:
