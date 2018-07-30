@@ -1,0 +1,47 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<h3>SERVICE</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Command</th>
+            <th>Status</th>
+            <th>Actioins</th>
+        </tr>
+    </thead>
+    {% for line in services %}
+        <tr>
+            <td>{{ line['id'] }}</td>            
+            <td>{{ line['name'] }}</td>            
+            <td>{{ line['cmd'] }}</td>            
+            <td>{{ line['status'] }}</td>            
+            <td><a href="#">RESTART</a></td>            
+        </tr>
+    {% endfor %}
+</table>
+<form>
+    <fieldset>
+        <legend>New/Edit Service</legend>
+        <label>Name</label>
+        <input type="text" placeholder="Service name">
+        <label>Command</label>
+        <input type="text" style="width: 100%" placeholder="Service start command">
+        <label>Start Time <button class="btn btn-mini" type="button"><i class="icon-plus"></i></button></label>
+        <input type="text" placeholder="Service start time">  <input type="text" placeholder="Service end time">
+        <br>
+        <button type="submit" class="btn">Save</button>
+    </fieldset>
+</form>
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    <script>
+    $(function() {
+
+    })
+    </script>
+{% endblock %}
