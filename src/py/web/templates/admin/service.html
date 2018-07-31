@@ -1,12 +1,20 @@
 {% extends 'admin/master.html' %}
 
 {% block body %}
+<link rel="stylesheet" type="text/css" href="/static/datetimepicker.css">
+<style type="text/css">
+#time_div span {display: block;}
+#time_div input {margin-right: 10px;}
+</style>
 <h3>SERVICE</h3>
+<div class="alert alert-danger" role="alert" style="display: none"></div>
+<div class="alert alert-success" role="alert" style="display: none">SUCCESS</div>
 <table class="table table-striped">
     <thead>
         <tr>
             <th>No.</th>
             <th>Name</th>
+            <th>Type</th>
             <th>Command</th>
             <th>Status</th>
             <th>Actioins</th>
@@ -14,34 +22,124 @@
     </thead>
     {% for line in services %}
         <tr>
-            <td>{{ line['id'] }}</td>            
-            <td>{{ line['name'] }}</td>            
-            <td>{{ line['cmd'] }}</td>            
-            <td>{{ line['status'] }}</td>            
-            <td><a href="#">RESTART</a></td>            
+            <td>{{ line['id'] }}</td>
+            <td>{{ line['name'] }}</td>
+            <td>{% if line['type'] == 1 %}CTP{% else %}MODEL{% endif %}</td>
+            <td>{{ line['cmd'] }}</td>
+            <td>{{ line['status'] }}</td>
+            <td>
+                <a href="#">RESTART</a>
+                <a href="#" class="edit"
+                    data-id="{{ line['id'] }}"
+                    data-name="{{ line['name'] }}"
+                    data-type="{{ line['type'] }}"
+                    data-cmd="{{ line['cmd'] }}"
+                    data-time="{{ line['run_config'] }}" >EDIT</a>
+                <a href="#" class="remove" data-id="{{ line['id'] }}" >REMOVE</a>
+            </td>
         </tr>
     {% endfor %}
 </table>
 <form>
     <fieldset>
+        <input type="hidden" id="id">
         <legend>New/Edit Service</legend>
         <label>Name</label>
-        <input type="text" placeholder="Service name">
+        <input type="text" id="name" placeholder="Service name">
+        <label>Type</label>
+        <label class="radio">
+        <input type="radio" name="type" id="type_1" value="1" checked > CTP
+        </label>
+        <label class="radio">
+        <input type="radio" name="type" id="type_2" value="2"> MODEL
+        </label>
         <label>Command</label>
-        <input type="text" style="width: 100%" placeholder="Service start command">
-        <label>Start Time <button class="btn btn-mini" type="button"><i class="icon-plus"></i></button></label>
-        <input type="text" placeholder="Service start time">  <input type="text" placeholder="Service end time">
+        <input type="text" id="cmd" style="width: 100%" placeholder="Service start command">
+        <label>Start Time <button id="new_time" class="btn btn-mini" type="button"><i class="icon-plus"></i></button></label>
+        <div id="time_div">
+            <span><input type="text" class="time" placeholder="Service start time"><input type="text" class="time" placeholder="Service end time"></span>
+        </div>
         <br>
-        <button type="submit" class="btn">Save</button>
+        <button type="button" id="save" class="btn">Save</button>
     </fieldset>
 </form>
 {% endblock %}
 
 {% block tail %}
     {{ super() }}
+    <script type="text/javascript" src="/static/datetimepicker.js"></script>
     <script>
     $(function() {
+        var add_picker = function () {
+            var $obj = $('#time_div')
+            $('.time', $obj).datetimepicker({
+                autoclose: 1,
+                startView: 1,
+                format: 'hh:ii',
+                minView: 0,
+            });
+        }
+        var add_time = function(t1, t2) {
+            $('#time_div').append('<span><input type="text" class="time" value="' + t1 + '" placeholder="Service start time"><input type="text" class="time" value="' + t2 + '" placeholder="Service end time"></span>')
+            add_picker()
+        }
+        $('#new_time').click(function() {
+            add_time()
+        })
+        add_picker()
 
+        $('#save').click(function() {
+            $('.alert').hide()
+            var params = {
+                'id': $('#id').val(),
+                'name': $('#name').val(),
+                'cmd': $('#cmd').val(),
+            }
+            var time = []
+            $('#time_div input').each(function(k, v) {
+                if ($(v).val()) time[k] = $(v).val()
+            })
+            params['run_config'] = JSON.stringify(time)
+
+            $.post('/admin/service/save', params, function(data) {
+                if (data.code) $('.alert-danger').html(data.msg).show()
+                else {
+                    $('.alert-success').show()
+                    setTimeout("location.reload()", 1000); 
+                }
+            }, 'json')
+        })
+
+        $('.edit').click(function() {
+            $('#id').val($(this).data('id'))
+            $('#name').val($(this).data('name'))
+            $('#cmd').val($(this).data('cmd'))
+            $('#type_' + $(this).data('type')).attr('checked')
+            var time = $(this).data('time')
+
+            var input_cnt = $('#time_div input').length
+            for (var i = 0; i < time.length; i=i+2) {
+
+                if (i >= input_cnt) {
+                    add_time(time[i], time[i+1])
+                } else {
+                    $('#time_div input:nth-child(' + (i + 1) + ')').val(time[i])
+                    $('#time_div input:nth-child(' + (i + 2) + ')').val(time[i + 1])
+                }
+            }
+        })
+
+        $('.remove').click(function() {
+            if (confirm("REMOVE?")) {
+                $.post('/admin/service/remove', {'id': $(this).data('id')}, function(data) {
+                    if (data.code) $('.alert-danger').html(data.msg).show()
+                    else {
+                        $('.alert-success').show()
+                        setTimeout("location.reload()", 1000); 
+                    }
+                }, 'json')
+            }
+        })
     })
     </script>
 {% endblock %}
