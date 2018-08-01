@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS `service` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(50) NOT NULL DEFAULT '',
     `type` int(4) NOT NULL DEFAULT 0,
+    `global_id` varchar(50) NOT NULL DEFAULT '',
     `cmd` text,
     `run_config` text,
     `mtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

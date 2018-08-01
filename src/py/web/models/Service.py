@@ -7,5 +7,7 @@ class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, default='')
     cmd = db.Column(db.String, default='')
+    type = db.Column(db.Integer, default='')
+    global_id = db.Column(db.String, default='')
     run_config = db.Column(db.String, default='')
     mtime = db.Column(db.DateTime, default=datetime.utcnow)

@@ -22,14 +22,14 @@ class TradeService():
     TUNNEL_IOC = 'IOC'
     TUNNEL_RESPONSE_IOC = 'RESPONSE_IOC_%s'
 
-    def __init__(self, modelName, iids):
+    def __init__(self, modelName, iids, version):
         self.server = Redis.get()
         self.sender = Redis.get()
         self.cache = Redis.get()
         self.config = Config.get()
 
         self.modelName = modelName
-        self.globalKey = modelName + ','.join(iids)
+        self.srvChannel = version
         self.appConfig = self.config['app'][modelName]
         self.iids = iids
 
@@ -71,7 +71,7 @@ class TradeService():
 
     def __trade(self, tunnel, iid, price, volume, isOpen, isBuy, isToday):
         data = {}
-        data['id'] = Tool.getTradeId(self.globalKey)
+        data['id'] = Tool.getTradeId(self.srvChannel)
         data['from'] = self.modelName
         data['iid'] = iid
         data['price'] = price
@@ -86,7 +86,7 @@ class TradeService():
 
     def run(self):
 
-        locker = Locker('ONLINE_SERVICE_RUNNING_' + self.globalKey)
+        locker = Locker('ONLINE.SERVICE.RUNNING.' + self.srvChannel)
         if locker.isLocking(): return
 
         srv = self.server.pubsub()
@@ -95,11 +95,11 @@ class TradeService():
             tunnel_tick.append(self.TUNNEL_TICK % iid)
 
         tunnel_rsp = [
-            self.TUNNEL_RESPONSE_TRADE % self.globalKey,
-            self.TUNNEL_RESPONSE_FAK % self.globalKey,
-            self.TUNNEL_RESPONSE_FOK % self.globalKey,
-            self.TUNNEL_RESPONSE_IOC % self.globalKey,
-            self.globalKey,
+            self.TUNNEL_RESPONSE_TRADE % self.srvChannel,
+            self.TUNNEL_RESPONSE_FAK % self.srvChannel,
+            self.TUNNEL_RESPONSE_FOK % self.srvChannel,
+            self.TUNNEL_RESPONSE_IOC % self.srvChannel,
+            self.srvChannel,
         ]
 
         srv.subscribe(tunnel_tick + tunnel_rsp)
@@ -108,7 +108,7 @@ class TradeService():
             if msg['type'] != 'message': continue
             tunnel = msg['channel']
 
-            if tunnel == self.globalKey:
+            if tunnel == self.srvChannel:
                 if msg['data'] == 'STOP':
                     break
                 else:

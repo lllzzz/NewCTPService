@@ -28,7 +28,8 @@
             <td>{{ line['cmd'] }}</td>
             <td>{{ line['status'] }}</td>
             <td>
-                <a href="#">RESTART</a>
+                <a href="#" class="restart" data-id="{{ line['id'] }}" >RESTART</a>
+                <a href="#" class="stop" data-id="{{ line['id'] }}" >STOP</a>
                 <a href="#" class="edit"
                     data-id="{{ line['id'] }}"
                     data-name="{{ line['name'] }}"
@@ -46,6 +47,8 @@
         <legend>New/Edit Service</legend>
         <label>Name</label>
         <input type="text" id="name" placeholder="Service name">
+        <label>Global ID</label>
+        <input type="text" id="global_id" style="width: 40%" placeholder="Global ID, SRV_MARKET/SRV_TRADE or others">
         <label>Type</label>
         <label class="radio">
         <input type="radio" name="type" id="type_1" value="1" checked > CTP
@@ -93,6 +96,8 @@
             var params = {
                 'id': $('#id').val(),
                 'name': $('#name').val(),
+                'global_id': $('#global_id').val(),
+                'type': $('input[name=type]').val(),
                 'cmd': $('#cmd').val(),
             }
             var time = []
@@ -105,7 +110,7 @@
                 if (data.code) $('.alert-danger').html(data.msg).show()
                 else {
                     $('.alert-success').show()
-                    setTimeout("location.reload()", 1000); 
+                    setTimeout("location.reload()", 1000);
                 }
             }, 'json')
         })
@@ -135,7 +140,31 @@
                     if (data.code) $('.alert-danger').html(data.msg).show()
                     else {
                         $('.alert-success').show()
-                        setTimeout("location.reload()", 1000); 
+                        setTimeout("location.reload()", 1000);
+                    }
+                }, 'json')
+            }
+        })
+
+        $('.restart').click(function() {
+            if (confirm("RESTART?")) {
+                $.post('/admin/service/restart', {'id': $(this).data('id')}, function(data) {
+                    if (data.code) $('.alert-danger').html(data.msg).show()
+                    else {
+                        $('.alert-success').show()
+                        setTimeout("location.reload()", 1000);
+                    }
+                }, 'json')
+            }
+        })
+
+        $('.stop').click(function() {
+            if (confirm("STOP?")) {
+                $.post('/admin/service/restart', {'id': $(this).data('id'), 'type': 'stop'}, function(data) {
+                    if (data.code) $('.alert-danger').html(data.msg).show()
+                    else {
+                        $('.alert-success').show()
+                        setTimeout("location.reload()", 1000);
                     }
                 }, 'json')
             }
