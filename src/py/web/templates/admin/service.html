@@ -33,6 +33,7 @@
                 <a href="#" class="edit"
                     data-id="{{ line['id'] }}"
                     data-name="{{ line['name'] }}"
+                    data-global_id="{{ line['global_id'] }}"
                     data-type="{{ line['type'] }}"
                     data-cmd="{{ line['cmd'] }}"
                     data-time="{{ line['run_config'] }}" >EDIT</a>
@@ -83,6 +84,8 @@
             });
         }
         var add_time = function(t1, t2) {
+            t1 = t1 || ''
+            t2 = t2 || ''
             $('#time_div').append('<span><input type="text" class="time" value="' + t1 + '" placeholder="Service start time"><input type="text" class="time" value="' + t2 + '" placeholder="Service end time"></span>')
             add_picker()
         }
@@ -97,7 +100,7 @@
                 'id': $('#id').val(),
                 'name': $('#name').val(),
                 'global_id': $('#global_id').val(),
-                'type': $('input[name=type]').val(),
+                'type': $('input[name=type]:checked').val(),
                 'cmd': $('#cmd').val(),
             }
             var time = []
@@ -118,8 +121,9 @@
         $('.edit').click(function() {
             $('#id').val($(this).data('id'))
             $('#name').val($(this).data('name'))
+            $('#global_id').val($(this).data('global_id'))
             $('#cmd').val($(this).data('cmd'))
-            $('#type_' + $(this).data('type')).attr('checked')
+            $('#type_' + $(this).data('type')).prop('checked', true)
             var time = $(this).data('time')
 
             var input_cnt = $('#time_div input').length

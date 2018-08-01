@@ -45,12 +45,13 @@ class ServiceView(ModelView):
     def save(self):
 
         id = request.form.get('id')
-
+        print id
         if id:
             service = self.get_one(id)
             if service is None:
                 return jsonify(code=10001, msg="service is not exist")
             form = self.edit_form(obj=service)
+            print form
             if self.update_model(form, service):
                 return jsonify(code=0, msg="ok")
 
@@ -63,7 +64,7 @@ class ServiceView(ModelView):
 
 
     @expose('/restart', methods=['POST'])
-    def save(self):
+    def restart(self):
 
         id = request.form.get('id')
         type = request.form.get('type')

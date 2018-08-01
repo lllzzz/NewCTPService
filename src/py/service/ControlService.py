@@ -9,12 +9,13 @@ import datetime
 import os
 import subprocess
 import time
+import demjson as JSON
 
 class ControlService():
 
     def __init__(self, cmd, runConfig, globalId):
         self.cmd = cmd
-        self.runConfig = runConfig
+        self.runConfig = JSON.decode(runConfig)
         self.globalId = globalId
         self.sender = Redis.get()
         self.build()
@@ -43,6 +44,26 @@ class ControlService():
         else:
             self.start()
 
+
+    def run(self):
+        now = datetime.datetime.now()
+        dateStr = now.strftime("%Y%m%d")
+
+        isRunTime = False
+        for i in xrange(0, len(self.runConfig), 2):
+            startTime = datetime.datetime.strptime("%s %s" % (dateStr, self.runConfig[i]),'%Y%m%d %H:%M')
+            endTime = datetime.datetime.strptime("%s %s" % (dateStr, self.runConfig[i+1]),'%Y%m%d %H:%M')
+            if endTime < startTime:
+                endTime = endTime + datetime.timedelta(days=1)
+            if startTime <= now <= endTime:
+                isRunTime = True
+
+        if isRunTime:
+            if not self.status():
+                self.start()
+        else:
+            if self.status():
+                self.stop()
 
 
 class CTPService(ControlService):
