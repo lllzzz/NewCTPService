@@ -73,7 +73,7 @@ void MessageTradeProcesser::setOrderInfo(CThostFtdcOrderField *pOrder)
 
 bool MessageTradeProcesser::isSetOrderInfo()
 {
-    if (_sessionId) return true;
+    if (_orderSysId.length() > 0) return true;
     return false;
 }
 

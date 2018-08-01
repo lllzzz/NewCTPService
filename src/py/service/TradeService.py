@@ -61,7 +61,7 @@ class TradeService():
     def cancel(self, iid, tradeId):
         data = {}
         data['id'] = Tool.getTradeId(self.modelName)
-        data['from'] = self.modelName
+        data['from'] = self.srvChannel
         data['iid'] = iid
         data['tradeId'] = tradeId
         jsonData = JSON.encode(data)
@@ -72,7 +72,7 @@ class TradeService():
     def __trade(self, tunnel, iid, price, volume, isOpen, isBuy, isToday):
         data = {}
         data['id'] = Tool.getTradeId(self.srvChannel)
-        data['from'] = self.modelName
+        data['from'] = self.srvChannel
         data['iid'] = iid
         data['price'] = price
         data['total'] = volume

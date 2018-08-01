@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Test</title>
-</head>
-<body>
+{% extends 'admin/master.html' %}
+
+{% block body %}
 <form action="" enctype='multipart/form-data' method='POST'>
     TEST DATA CSV：<input type="file" name="file">
     <input type="submit" value="RUN">
@@ -14,5 +11,5 @@
 {{ l }}
 {% endfor %}
 </textarea>
-</body>
-</html>
+{% endblock %}
+

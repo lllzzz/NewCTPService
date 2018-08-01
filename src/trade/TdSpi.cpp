@@ -35,7 +35,7 @@ void TdSpi::_clearProcesser(int reqId)
 TdSpi::TdSpi()
 {
     _reqId = 1;
-    _iids = Config::getV("iids");
+    // _iids = Config::getV("iids");
     _tradeProcesserMap = map<int, MessageTradeProcesser*>();
     _tdReqIdMap = map<string, int>();
 
@@ -134,8 +134,8 @@ int TdSpi::trade(int tdReqId, string iid,
 {
 
     std::vector<string>::iterator it;
-    it = find(_iids.begin(), _iids.end(), iid);
-    if (it != _iids.end()) return 0;
+    // it = find(_iids.begin(), _iids.end(), iid);
+    // if (it != _iids.end()) return 0;
 
     LOG(INFO) << "TRADE" << "|"
         << tdReqId << "|"

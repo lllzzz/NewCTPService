@@ -1,8 +1,7 @@
 {
     "iids": [
-        "hc",
-        "aa",
-        "bb"
+        "al",
+        "hc"
     ],
     "appRoot": "/home/dev/src/CTPService",
     "ctpConfig": "etc/config.dev.json",
@@ -21,5 +20,6 @@
         "user": "root",
         "name": "ctp_dev",
         "port": 3306
-    }
+    },
+    "queueKey": "CTP.DATA.QUEUE"
 }

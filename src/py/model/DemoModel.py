@@ -42,6 +42,9 @@ class DemoModel(ModelBase):
     def __init__(self, appKey, tradeSrv):
         super(DemoModel, self).__init__(appKey, tradeSrv)
         print "INIT:", self.appConfig
+        self.i = 0
+        self.isBuy = True
+        self.isOpen = True
 
 
     def onTick(self, tick):
@@ -60,8 +63,12 @@ class DemoModel(ModelBase):
         }
         """
         print "TICK:", tick
-        tradeId = self.tradeFOK(tick['iid'], tick['price'],  1, True, True, True)
-        print "TRADEID:", tradeId
+        self.i += 1
+        if self.i % 2 == 0:
+            tradeId = self.tradeIOC(tick['iid'], tick['price'],  1, self.isOpen, self.isBuy, True)
+            self.isOpen = not self.isOpen
+            self.isBuy = not self.isBuy
+            print "TRADEID:", tradeId
         pass
 
 
