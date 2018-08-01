@@ -11,7 +11,7 @@
         "passwd": "Abc518131!",
         "name": "ctp_dev"
     },
-    "iids": ["hc1805", "al1809"],
+    "iids": ["al1809"],
     "mdFront": "tcp://218.202.237.33:10012",
     "tdFront": "tcp://218.202.237.33:10002",
     "brokerId": "9999",
