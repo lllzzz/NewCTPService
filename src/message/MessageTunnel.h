@@ -18,4 +18,6 @@ const string IOC = "IOC";
 const string RESPONSE_IOC = "RESPONSE_IOC_";
 const string QUERY = "QUERY";
 const string RESPONSE_QUERY = "RESPONSE_QUERY_";
+const string SRV_TRADE = "SRV_TRADE";
+const string SRV_MARKET = "SRV_MARKET";
 #endif

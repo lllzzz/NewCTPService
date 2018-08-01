@@ -2,9 +2,11 @@ from web.ctp import app, db, admin, stream_template
 from flask_admin.contrib.sqla import ModelView
 from web.models.Tick import createTickModel
 from web.models.Model import Model
+from web.models.Service import Service
 from web.views.CtpModelView import CtpModelView
 from web.views.TickView import *
 from web.views.ConfigView import ConfigView
+from web.views.ServiceView import ServiceView
 from web.views.LBTestView import LBTestView
 from redis import Redis
 from flask_admin.contrib import rediscli
@@ -17,6 +19,7 @@ config = Config.get()
 admin.add_view(CtpModelView(Model, db.session))
 admin.add_view(TickData(name='Upload Data', category='Tick'))
 admin.add_view(ConfigView(name='Config'))
+admin.add_view(ServiceView(Service, db.session, name='Service'))
 # admin.add_view(LBTestView(name='LBTest'))
 admin.add_view(rediscli.RedisCli(Redis(host=config['redis']['host'], db=config['redis']['db'])))
 

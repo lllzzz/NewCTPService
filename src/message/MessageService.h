@@ -29,7 +29,7 @@ class MessageService
 {
 private:
 
-    MessageService();
+    MessageService(string name);
 
     static MessageService* instance;
 
@@ -37,12 +37,13 @@ private:
 
     redisContext* redisHandler;
     redisReply* redisRet;
+    string _name;
 
 
 public:
     ~MessageService();
 
-    static MessageService* getInstance();
+    static MessageService* getInstance(string name);
 
     void fire(string, Json::Value);
     void run();

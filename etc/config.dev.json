@@ -11,7 +11,7 @@
         "passwd": "Abc518131!",
         "name": "ctp_dev"
     },
-    "iids": ["hc1805"],
+    "iids": ["hc1805", "al1809"],
     "mdFront": "tcp://218.202.237.33:10012",
     "tdFront": "tcp://218.202.237.33:10002",
     "brokerId": "9999",
@@ -20,7 +20,7 @@
 
     "queueKey": "CTP.DATA.QUEUE",
 
-    "is_log_std": 0,
+    "is_log_std": 1,
     "path": {
         "mdFlow": "/home/dev/src/CTPService/flow/m/",
         "tdFlow": "/home/dev/src/CTPService/flow/t/",

@@ -1,7 +1,8 @@
 #include "MdSpi.h"
 #include <signal.h>
 #include "../common/Config.h"
-// #include "../common/Status.h"
+#include "../message/MessageService.h"
+#include "../message/MessageTunnel.h"
 
 using namespace std;
 
@@ -26,11 +27,6 @@ int main(int argc, char const *argv[])
     }
     CONFIG_PATH = argv[1];
     
-    // Status* status = new Status("MARKET_SRV");
-    // if (status->isRunning()) {
-    //     cout << "正在提供服务，不要重复执行" << endl;
-    //     return 1;
-    // }
 
     // signal(30, shutdown);
     // ofstream pid;
@@ -53,8 +49,10 @@ int main(int argc, char const *argv[])
     mApi->RegisterSpi(&mSpi);
     mApi->RegisterFront(const_cast<char*>(mdFront.c_str()));
     mApi->Init();
+    // mApi->Join();
     cout << "Market服务启动..." << endl;
-    mApi->Join();
+    MessageService* msgSrv = MessageService::getInstance(SRV_MARKET);
+    msgSrv->run();
 
     return 0;
 }

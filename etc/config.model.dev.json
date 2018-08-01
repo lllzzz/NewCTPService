@@ -1,24 +1,25 @@
 {
     "iids": [
-        "hc", 
-        "aa", 
+        "hc",
+        "aa",
         "bb"
-    ], 
-    "appRoot": "/home/dev/src/CTPService", 
+    ],
+    "appRoot": "/home/dev/src/CTPService",
+    "ctpConfig": "etc/config.dev.json",
     "redis": {
-        "host": "127.0.0.1", 
-        "db": 1, 
+        "host": "127.0.0.1",
+        "db": 1,
         "port": 6379
-    }, 
+    },
     "app": {
-        "test": {}, 
+        "test": {},
         "demo": {}
-    }, 
+    },
     "mysql": {
-        "passwd": "Abc518131!", 
-        "host": "127.0.0.1", 
-        "user": "root", 
-        "name": "ctp_dev", 
+        "passwd": "Abc518131!",
+        "host": "127.0.0.1",
+        "user": "root",
+        "name": "ctp_dev",
         "port": 3306
     }
 }

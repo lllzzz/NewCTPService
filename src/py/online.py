@@ -11,13 +11,13 @@ from service.TradeService import TradeService
 
 parser = argparse.ArgumentParser()
 parser.add_argument('model_name', help='model name')
-parser.add_argument('version', help='running version')
 parser.add_argument('iids', help='iids name, use "," to split')
+parser.add_argument('global_id', help='global id')
 args = parser.parse_args()
 
 modelName   = args.model_name
-version = args.version
 iids        = args.iids.split(',')
+globalId    = args.global_id
 
-srv = TradeService(modelName, version, iids)
+srv = TradeService(modelName, iids, globalId)
 srv.run()
