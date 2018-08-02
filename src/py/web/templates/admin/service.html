@@ -125,7 +125,7 @@
             $('#cmd').val($(this).data('cmd'))
             $('#type_' + $(this).data('type')).prop('checked', true)
             var time = $(this).data('time')
-
+            $('#time_div').empty()
             var input_cnt = $('#time_div input').length
             for (var i = 0; i < time.length; i=i+2) {
 

@@ -54,7 +54,11 @@
                     if (data.code) {
                         $('#msg').text(data.msg).show()
                     } else {
-                        $('#success').text('TOTAL:' + data.data.total + ', SUCCESS:' + data.data.succ).show()
+                        if (data.data) {
+                            $('#success').text('TOTAL:' + data.data.total + ', SUCCESS:' + data.data.succ).show()
+                        } else {
+                            $('#success').text(data.msg).show()
+                        }
                         setTimeout("location.reload()", 1000);
                     }
                 },

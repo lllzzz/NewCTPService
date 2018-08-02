@@ -14,6 +14,7 @@ class TickView(ModelView):
     can_create = False
     can_edit = False
     can_view_details = True
+    column_default_sort = ('time', True)
 
 
 class TickData(BaseView):
@@ -63,11 +64,11 @@ class TickData(BaseView):
                 admin.add_view(TickView(tickModel, db.session, category='Tick'))
                 app._got_first_request = tmp_val
 
-            
+
 
             f = request.files['csv']
             if not f:
-                return jsonify(code=10002, msg="Please upload csv file")
+                return jsonify(code=0, msg="create iid success")
             tmpPath = '/tmp/%s' % (f.filename)
             f.save(tmpPath)
             csv_reader = csv.reader(open(tmpPath))
@@ -84,7 +85,7 @@ class TickData(BaseView):
 
                 total += 1
                 if self.insertTickData(mysql, iid, row):
-                    succ += 1                
+                    succ += 1
 
             return jsonify(code=0, msg='ok', data={'total': total, 'succ': succ})
 

@@ -1,25 +1,26 @@
 {
     "iids": [
-        "al",
-        "hc"
-    ],
-    "appRoot": "/home/dev/src/CTPService",
-    "ctpConfig": "etc/config.dev.json",
+        "hc", 
+        "al"
+    ], 
+    "appRoot": "/home/dev/src/CTPService", 
     "redis": {
-        "host": "127.0.0.1",
-        "db": 1,
+        "host": "127.0.0.1", 
+        "db": 1, 
         "port": 6379
-    },
-    "app": {
-        "test": {},
-        "demo": {}
-    },
+    }, 
+    "ctpConfig": "etc/config.dev.json", 
     "mysql": {
-        "passwd": "Abc518131!",
-        "host": "127.0.0.1",
-        "user": "root",
-        "name": "ctp_dev",
-        "port": 3306
-    },
-    "queueKey": "CTP.DATA.QUEUE"
+        "passwd": "Abc518131!", 
+        "host": "127.0.0.1", 
+        "port": 3306, 
+        "name": "ctp_dev", 
+        "user": "root"
+    }, 
+    "queueKey": "CTP.DATA.QUEUE", 
+    "app": {
+        "demo": {
+            "testData": 1
+        }
+    }
 }

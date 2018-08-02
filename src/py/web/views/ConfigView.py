@@ -16,6 +16,6 @@ class ConfigView(BaseView):
             newApp = json.loads(content)
             config['app'] = newApp
             Config.write(config)
-            return redirect('admin/configview')
+            return redirect('admin/config')
 
         return self.render('admin/config.html', appStr = appStr)

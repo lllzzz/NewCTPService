@@ -8,7 +8,6 @@ from web.views.TickView import *
 from web.views.ConfigView import ConfigView
 from web.views.ServiceView import ServiceView
 from web.views.RunnerView import RunnerView
-from web.views.LBTestView import LBTestView
 from redis import Redis
 from flask_admin.contrib import rediscli
 from common.Config import Config
@@ -19,7 +18,7 @@ from common.Config import Config
 config = Config.get()
 admin.add_view(CtpModelView(Model, db.session))
 admin.add_view(TickData(name='Upload Data', category='Tick'))
-admin.add_view(ConfigView(name='Config'))
+admin.add_view(ConfigView(name='Config', url="/admin/config"))
 admin.add_view(ServiceView(Service, db.session, name='Service'))
 admin.add_view(RunnerView(name='Runner', url="/admin/runner"))
 admin.add_view(rediscli.RedisCli(Redis(host=config['redis']['host'], db=config['redis']['db'])))
