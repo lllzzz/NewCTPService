@@ -2,6 +2,7 @@
 # -*- encoding:utf-8 -*-
 #
 from .ModelBase import ModelBase
+from common.Logger import Logger
 
 class DemoModel(ModelBase):
     """
@@ -41,10 +42,11 @@ class DemoModel(ModelBase):
     """
     def __init__(self, appKey, tradeSrv):
         super(DemoModel, self).__init__(appKey, tradeSrv)
-        print "INIT:", self.appConfig
         self.i = 0
         self.isBuy = True
         self.isOpen = True
+        self.logger = Logger('demo', False)
+        self.logger.info("INIT", self.appConfig)
 
 
     def onTick(self, tick):
@@ -54,7 +56,7 @@ class DemoModel(ModelBase):
             'iid': 'hc1808', // 合约
             'price': 3400, // 最新价
             'volume': 340, // 数量
-            'bid1Price': 3333, 
+            'bid1Price': 3333,
             'bid1Volume': 300,
             'ask1Price': 3322,
             'ask1Volume': 33,
@@ -62,13 +64,13 @@ class DemoModel(ModelBase):
             'msec': 500, // 毫秒
         }
         """
-        print "TICK:", tick
+        self.logger.info("TICK", tick)
         self.i += 1
-        if self.i % 2 == 0:
+        if self.i % 5 == 0:
             tradeId = self.tradeIOC(tick['iid'], tick['price'],  1, self.isOpen, self.isBuy, True)
             self.isOpen = not self.isOpen
             self.isBuy = not self.isBuy
-            print "TRADEID:", tradeId
+            self.logger.info("TRADEID", tradeId)
         pass
 
 
@@ -78,9 +80,8 @@ class DemoModel(ModelBase):
         dealPrice: Float 成交价
         dealVolume: Int 成交量
         """
-        print "SUCCESS:", tradeId, dealPrice, dealVolume
-        pass
+        self.logger.info("SUCCESS", tradeId, dealPrice, dealVolume)
 
     def tradeCancel(self, tradeId):
-		print "CANCEL:" + tradeId
+        self.logger.info("CANCEL", tradeId)
 
