@@ -1,30 +1,60 @@
 {% extends 'admin/master.html' %}
 
 {% block body %}
-<h3>正在执行的回测</h3>
-    <ul>
-    {% for one in locking %}
-        <li>{{ one }}</li>
-    {% endfor %}
-    </ul>
-    <hr>
-    <h3>回测参数</h3>
-    <form action="" enctype='multipart/form-data' method='POST'>
+<link rel="stylesheet" type="text/css" href="/static/datetimepicker.css">
+<h3>Running List</h3>
+<ul>
+{% for one in locking %}
+    <li>{{ one }}</li>
+{% endfor %}
+</ul>
+<hr>
+<form action="" enctype='multipart/form-data' method='POST'>
+    <fieldset>
+        <legend><h3>Test Params</h3></legend>
         <input type="hidden" name="id" value="{{ id }}">
-        回测版本号:<input type="text" name="testVersion" value=""><br>
-        合约ID【多个用,分割】:<input type="text" name="iids" value=""><br>
-        回测开始时间:<input type="text" name="startDate" value=""><br>
-        回测结束时间:<input type="text" name="endDate" value=""><br>
-        是否有滑点:<input type="radio" name="isRandom" value="1">是<input type="radio" name="isRandom" value="0">否<br>
-        随机最大滑点:<input type="text" name="maxSlippage"><br>
-        <input type="submit" value="RUN">
-    </form>
-    <hr>
-    <h3>Test Log</h3>
-    <ul>
-    {% for one in logs %}
-        <li><a href="/static/logs/{{ one }}">{{ one }}</a></li>
-    {% endfor %}
-    </ul>
+        <label>Version:</label>
+        <input type="text"  placeholder="Test ID" name="testVersion" >
+        <label>Instrument IDs:</label>
+        <input type="text" placeholder="al,hc" name="iids" >
+        <label>Start Date</label>
+        <input type="text" placeholder="" class="time" name="startDate" >
+        <label>End Date</label>
+        <input type="text" placeholder="" class="time" name="endDate" >
+        <label>is Random</label>
+        <label class="radio">
+        <input type="radio" name="isRandom" value="1" > YES
+        </label>
+        <label class="radio">
+        <input type="radio" name="isRandom" value="0" checked> NO
+        </label>
+        <label>Max Radmon:</label>
+        <input type="text" placeholder="5" name="maxSlippage">
+        <br>
+        <button type="submit" class="btn">RUN</button>
+  </fieldset>
+</form>
+<hr>
+<h3>Test Log</h3>
+<ul>
+{% for one in logs %}
+    <li><a href="/static/logs/{{ one }}">{{ one }}</a></li>
+{% endfor %}
+</ul>
 
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    <script type="text/javascript" src="/static/datetimepicker.js"></script>
+    <script>
+    $(function() {
+        $('.time').datetimepicker({
+            autoclose: 1,
+            // startView: 3,
+            format: 'yyyy-mm-dd',
+            minView: 3,
+        });
+    })
+    </script>
 {% endblock %}

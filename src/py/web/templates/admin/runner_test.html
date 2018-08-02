@@ -2,9 +2,15 @@
 
 {% block body %}
 <form action="" enctype='multipart/form-data' method='POST'>
-    TEST DATA CSV：<input type="file" name="file">
-    <input type="submit" value="RUN">
+    <fieldset>
+        <input type="hidden" name="id" value="{{ id }}">
+        <legend><h3>TEST</h3></legend>
+        <label>Test Data CSV:</label>
+        <input type="file" name="file">
+        <button type="submit" class="btn">RUN</button>
+  </fieldset>
 </form>
+<hr>
 <h3>Test Log</h3>
 <textarea style="width: 100%; height: 500px;">
 {% for l in logs %}
