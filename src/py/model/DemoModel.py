@@ -66,7 +66,7 @@ class DemoModel(ModelBase):
         """
         self.logger.info("TICK", tick)
         self.i += 1
-        if self.i % 5 == 0:
+        if self.i % 10 == 0:
             tradeId = self.tradeIOC(tick['iid'], tick['price'],  1, self.isOpen, self.isBuy, True)
             self.isOpen = not self.isOpen
             self.isBuy = not self.isBuy

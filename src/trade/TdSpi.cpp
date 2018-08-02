@@ -186,7 +186,6 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         LOG(INFO) << "ORDER EMPTY";
         exit(1);
     }
-    if (pOrder->FrontID != _frontId || pOrder->SessionID != _sessionId) return;
 
     LOG(INFO) << "ORDER INFO" << "|"
         << pOrder->OrderRef << "|"
@@ -197,6 +196,8 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
         << pOrder->VolumeTotal << "|"
         << pOrder->ZCETotalTradedVolume << "|"
         << pOrder->OrderSysID;
+
+    if (pOrder->FrontID != _frontId || pOrder->SessionID != _sessionId) return;
 
     MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pOrder->OrderRef))];
     LOG(INFO) << processer;
@@ -223,12 +224,6 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
         exit(1);
     }
 
-    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pTrade->OrderRef))];
-    if (!processer->checkOrder(pTrade)) {
-        LOG(INFO) << "NOT MYTRADE";
-        return;
-    }
-
     LOG(INFO) << "TRADE INFO" << "|"
         << pTrade->OrderRef << "|"
         << pTrade->InstrumentID << "|"
@@ -238,6 +233,15 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
         << pTrade->TradeTime << "|"
         << pTrade->ExchangeID << "|"
         << pTrade->Volume;
+
+    int ref = Tool::s2i(string(pTrade->OrderRef));
+    if (_tradeProcesserMap.find(ref) == _tradeProcesserMap.end()) return;
+
+    MessageTradeProcesser* processer = _tradeProcesserMap[ref];
+    if (!processer->checkOrder(pTrade)) {
+        LOG(INFO) << "NOT MYTRADE";
+        return;
+    }
 
     Json::Value data;
     data["dealPrice"] = pTrade->Price;
@@ -290,8 +294,10 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
             << bIsLast;
         exit(1);
     }
+    int ref = Tool::s2i(string(pInputOrder->OrderRef));
+    if (_tradeProcesserMap.find(ref) == _tradeProcesserMap.end()) return;
+    MessageTradeProcesser* processer = _tradeProcesserMap[ref];
 
-    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrder->OrderRef))];
     LOG(INFO) << "ORDER INSERT INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -310,8 +316,9 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
             << pRspInfo->ErrorMsg;
         exit(1);
     }
-
-    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrder->OrderRef))];
+    int ref = Tool::s2i(string(pInputOrder->OrderRef));
+    if (_tradeProcesserMap.find(ref) == _tradeProcesserMap.end()) return;
+    MessageTradeProcesser* processer = _tradeProcesserMap[ref];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrder->OrderRef << "|"
@@ -334,8 +341,9 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
         exit(1);
     }
     if (pInputOrderAction->SessionID != _sessionId || pInputOrderAction->FrontID != _frontId) return;
-
-    MessageTradeProcesser* processer = _tradeProcesserMap[Tool::s2i(string(pInputOrderAction->OrderRef))];
+    int ref = Tool::s2i(string(pInputOrderAction->OrderRef));
+    if (_tradeProcesserMap.find(ref) == _tradeProcesserMap.end()) return;
+    MessageTradeProcesser* processer = _tradeProcesserMap[ref];
     LOG(INFO) << "ORDER ERROR INFO" << "|"
         << processer->getId() << "|"
         << pInputOrderAction->OrderRef << "|"

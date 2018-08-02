@@ -36,8 +36,9 @@ class CtpModelView(ModelView):
         form = self.edit_form(obj=model)
         if self.validate_form(form):
             if self.update_model(form, model):
+                config = Config.get()
 
-                filename = 'src/py/model/%s.py' % (form.class_name.data)
+                filename = '%s/src/py/model/%s.py' % (config['appRoot'], form.class_name.data)
 
                 with open(filename,'w') as f:
                     f.write(form.source.data)
