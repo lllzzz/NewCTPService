@@ -18,9 +18,15 @@ db = MySQL()
 rds = Redis.get()
 config = Config.get()
 
-iids = config['iids'];
+iids = config['iids']
+runningKey = 'CTP.QUEUE.RUNNING.CNT'
+rds.incr(runningKey)
 
-while True:
+for i in xrange(1,10000):
+
+    runningCnt = int(rds.get(runningKey))
+    if runningCnt > 5:
+        break
 
     data = rds.rpop(config['queueKey'])
     if not data:
@@ -120,7 +126,7 @@ while True:
 
 
 
-
+rds.decr(runningKey)
 
 
 
