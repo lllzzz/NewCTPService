@@ -2,6 +2,7 @@
 # -*- encoding:utf-8 -*-
 #
 from .ModelBase import ModelBase
+from .Data import Data
 from common.Logger import Logger
 
 class DemoModel(ModelBase):
@@ -47,7 +48,11 @@ class DemoModel(ModelBase):
         self.isOpen = True
         self.logger = Logger('demo', False)
         self.logger.info("INIT", self.appConfig)
-
+        
+        self.data = Data()
+        self.tickList = self.data.getTickHistory('al', ['al1809'], '20180807 14:50:00', '20180807 15:00:00')
+		
+        self.logger.info("LIST", self.tickList)
 
     def onTick(self, tick):
         """
@@ -84,4 +89,5 @@ class DemoModel(ModelBase):
 
     def tradeCancel(self, tradeId):
         self.logger.info("CANCEL", tradeId)
+        
 

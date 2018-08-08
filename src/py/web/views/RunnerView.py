@@ -39,16 +39,16 @@ class RunnerView(BaseView):
             modelName = model.nick_name
             f = request.files['file']
             uploadPath = ''
+            config = Config.get()
             if f.filename:
-                config = Config.get()
-                uploadPath = config + 'src/py/web/static/test_data/' + modelName + '.csv'
+                uploadPath = config['appRoot'] + '/src/py/web/static/test_data/' + modelName + '.csv'
                 f.save(uploadPath)
 
             @flask.stream_with_context
             def generate():
                 id = request.args.get('id')
                 model = Model.query.get(id)
-                cmd = 'CTP_CONFIG_PATH=%s python src/py/test.py %s %s' % (os.environ.get('CTP_CONFIG_PATH'), modelName, uploadPath)
+                cmd = 'CTP_CONFIG_PATH=%s python %s/src/py/test.py %s %s' % (os.environ.get('CTP_CONFIG_PATH'), config['appRoot'], modelName, uploadPath)
                 p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 while p.poll() is None:
                     line = p.stdout.read()
@@ -63,6 +63,7 @@ class RunnerView(BaseView):
 
     @expose('/lbtest', methods=['POST', 'GET'])
     def lbtest(self):
+        config = Config.get()
 
         if request.method == 'GET':
 
@@ -89,18 +90,19 @@ class RunnerView(BaseView):
 
             model = Model.query.get(id)
             modelName = model.nick_name
+            
 
-            cmd = 'CTP_CONFIG_PATH=%s python src/py/lbtest.py %s %s %s %s %s %s' \
-                % (os.environ.get('CTP_CONFIG_PATH'), optional, modelName, testVersion, iids,
+            cmd = 'CTP_CONFIG_PATH=%s python %s/src/py/lbtest.py %s %s %s %s %s %s' \
+                % (os.environ.get('CTP_CONFIG_PATH'), config['appRoot'], optional, modelName, testVersion, iids,
                 startDate, endDate)
 
             now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            fd = open('src/py/web/static/logs/lbtest/%s_%s_%s.log' % (modelName, testVersion, now), 'w')
+            fd = open('%s/src/py/web/static/logs/lbtest/%s_%s_%s.log' % (config['appRoot'], modelName, testVersion, now), 'w')
             subprocess.Popen(cmd, shell=True, stdout=fd)
 
         locking = Locker.getLocking('TEST_SERVICE_RUNNING_' + modelName)
         files = []
-        for file in os.listdir('src/py/web/static/logs/lbtest/'):
+        for file in os.listdir('%s/src/py/web/static/logs/lbtest/' % (config['appRoot'])):
             if file.find(modelName) >= 0:
                 files.append(file)
 
